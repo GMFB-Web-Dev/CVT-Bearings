@@ -42,20 +42,22 @@ export function Header() {
       </div>
       <button className="offer-dismiss" type="button" onClick={() => setOfferVisible(false)} aria-label="Close first order discount"><X size={18}/></button>
     </div>
-    <div className="network-bar">
-      <div className="network-links"><a href="https://cvtnz.co.nz">CVT<span>NZ</span></a><Link className="active" href="/">CVT<small>Bearings</small></Link><a href="https://cvt-parts.co.nz">CVT<small>Parts</small></a></div>
-      <div className="utility-links"><ActiveLink href="/about">About</ActiveLink><ActiveLink href="/contact">Contact</ActiveLink><ActiveLink href="/login-sign-up" match={["/login", "/account"]}>Sign in / Sign up</ActiveLink><Link href="/account#wishlist" className="utility-icon" aria-label="Wishlist"><Heart size={17}/></Link><button onClick={() => setOpen(true)} aria-label="Open cart"><ShoppingCart size={18}/>{count > 0 && <b>{count}</b>}</button></div>
+    <div className="sticky-navigation">
+      <div className="network-bar">
+        <div className="network-links"><a href="https://cvtnz.co.nz">CVT<span>NZ</span></a><Link className="active" href="/">CVT<small>Bearings</small></Link><a href="https://cvt-parts.co.nz">CVT<small>Parts</small></a></div>
+        <div className="utility-links"><ActiveLink href="/about">About</ActiveLink><ActiveLink href="/contact">Contact</ActiveLink><ActiveLink href="/login-sign-up" match={["/login", "/account"]}>Sign in / Sign up</ActiveLink><Link href="/account#wishlist" className="utility-icon" aria-label="Wishlist"><Heart size={17}/></Link><button onClick={() => setOpen(true)} aria-label="Open cart"><ShoppingCart size={18}/>{count > 0 && <b>{count}</b>}</button></div>
+      </div>
+      <header className="main-header">
+        <Link href="/" className="brand"><Image src="/assets/logo.png" width={235} height={64} alt="CVT Bearings" priority unoptimized /></Link>
+        <nav className={menu ? "nav open" : "nav"} aria-label="Primary navigation">
+          <ActiveLink href="/" exact onClick={() => setMenu(false)}>Home</ActiveLink>
+          <div className="nav-dropdown"><ActiveLink href="/bearings" match={["/products"]} onClick={() => setMenu(false)}>Shop bearings <ChevronDown size={15}/></ActiveLink><div><ActiveLink href="/bearings/main-bearing-kits" onClick={() => setMenu(false)}>Main bearing kits</ActiveLink><ActiveLink href="/bearings/pulley-bearings" onClick={() => setMenu(false)}>Pulley bearings</ActiveLink><ActiveLink href="/bearings/primary-pulley-bearings" onClick={() => setMenu(false)}>Primary pulley bearings</ActiveLink></div></div>
+          <ActiveLink href="/help" match={["/shipping-returns", "/orders-payments"]} onClick={() => setMenu(false)}>General information</ActiveLink>
+        </nav>
+        <form className="header-search" action="/bearings"><input name="q" placeholder="Search Part"/><button aria-label="Search"><Search size={16}/></button></form>
+        <Link href="/login-sign-up" className="mobile-account" aria-label="Account"><UserRound/></Link>
+        <button className="menu-button" onClick={() => setMenu(!menu)} aria-label="Menu">{menu ? <X/> : <Menu/>}</button>
+      </header>
     </div>
-    <header className="main-header">
-      <Link href="/" className="brand"><Image src="/assets/logo.png" width={235} height={64} alt="CVT Bearings" priority unoptimized /></Link>
-      <nav className={menu ? "nav open" : "nav"} aria-label="Primary navigation">
-        <ActiveLink href="/" exact onClick={() => setMenu(false)}>Home</ActiveLink>
-        <div className="nav-dropdown"><ActiveLink href="/bearings" match={["/products"]} onClick={() => setMenu(false)}>Shop bearings <ChevronDown size={15}/></ActiveLink><div><ActiveLink href="/bearings/main-bearing-kits" onClick={() => setMenu(false)}>Main bearing kits</ActiveLink><ActiveLink href="/bearings/pulley-bearings" onClick={() => setMenu(false)}>Pulley bearings</ActiveLink><ActiveLink href="/bearings/primary-pulley-bearings" onClick={() => setMenu(false)}>Primary pulley bearings</ActiveLink></div></div>
-        <ActiveLink href="/help" match={["/shipping-returns", "/orders-payments"]} onClick={() => setMenu(false)}>General information</ActiveLink>
-      </nav>
-      <form className="header-search" action="/bearings"><input name="q" placeholder="Search Part"/><button aria-label="Search"><Search size={16}/></button></form>
-      <Link href="/login-sign-up" className="mobile-account" aria-label="Account"><UserRound/></Link>
-      <button className="menu-button" onClick={() => setMenu(!menu)} aria-label="Menu">{menu ? <X/> : <Menu/>}</button>
-    </header>
   </>;
 }
