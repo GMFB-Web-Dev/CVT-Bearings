@@ -29,11 +29,15 @@ export function BrandMarquee() {
 
 export function PromoCards() {
   const cards = [
-    ["/assets/promo-blog.png", "New Blog", "Check out our latest blog", "/blogs", "Read now"],
-    ["/assets/promo-signup.png", "Sign Up Now", "Get 10% off your first order", "/login-sign-up", "Sign up now"],
-    ["/assets/promo-bulk.png", "Bulk Order Now", "Business order? Get it cheaper", "/contact?service=bulk", "Bulk order"],
+    ["/assets/promo-bulk-purchases.png", "Bulk Purchases", "Better pricing for larger orders", "/contact?service=bulk", "Bulk order"],
+    ["/assets/promo-cvt-blogs.png", "CVT Blogs", "Practical guides, tips and bearing insights", "/blogs", "Read blogs"],
+    ["/assets/promo-cvt-nz.png", "CVT New Zealand", "Trusted CVT information and expert advice", "https://cvt.co.nz/", "Visit CVT NZ"],
+    ["/assets/promo-diagnostic-tool.png", "Free CVT Diagnostic Tool", "Select your vehicle and symptoms for a fixed quote", "https://cvt.co.nz/cvt-symptom-diagnostic-tool/", "Try it now"],
+    ["/assets/promo-signup.png", "Sign Up & Save", "Get 10% off your first CVT Bearings order", "/login-sign-up", "Sign up now"],
   ];
-  const carouselCards = Array.from({ length: 3 }, (_, page) => cards.map((_, position) => cards[(page + position) % cards.length])).flat();
+  const carouselCards = Array.from({ length: cards.length }, (_, page) =>
+    Array.from({ length: 3 }, (_, position) => cards[(page + position) % cards.length]),
+  ).flat();
   return <section className="promo-section section"><div className="page-width"><AutoCarousel className="promo-carousel" label="Promotions" desktopVisible={3} tabletVisible={2} fixedPageSize={3} interval={5500}>{carouselCards.map(([image, title, body, href, action], index) => <article className="promo-card" key={`${title}-${index}`}><Image src={image} width={1254} height={1254} sizes="(max-width: 650px) 100vw, (max-width: 1000px) 50vw, 33vw" alt={title}/><div><span><b>{title}</b><small>{body}</small></span><Link href={href}>{action}</Link></div></article>)}</AutoCarousel></div></section>;
 }
 

@@ -15,4 +15,4 @@ The page-specific hero images (`about-hero.jpg`, `contact-hero.jpg`, and `shippi
 
 All storefront product photography is resolved from `products/`, which mirrors the supplied developer package. Products without an assigned package photo use a neutral text placeholder rather than unrelated artwork.
 
-The three promotional card images are the original 1254 × 1254 image fills embedded in `CVT Bearings.fig`; the earlier 314 × 314 derivatives have been replaced.
+The five promotional card images are the supplied 1254 × 1254 PNG exports: Bulk Purchases, CVT Blogs, CVT New Zealand, Free CVT Diagnostic Tool and the new-customer sign-up offer.
