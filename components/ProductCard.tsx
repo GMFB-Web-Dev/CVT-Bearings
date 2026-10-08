@@ -6,6 +6,7 @@ import { useState } from "react";
 import type { Product } from "@/lib/catalog";
 import { money, productImage } from "@/lib/catalog";
 import { useCart } from "@/components/CartProvider";
+import { QuantitySelect } from "@/components/QuantitySelect";
 
 export function ProductCard({ product }: { product: Product }) {
   const [quantity, setQuantity] = useState(1);
@@ -18,7 +19,7 @@ export function ProductCard({ product }: { product: Product }) {
       <Link href={`/products/${product.slug}`}>{product.title}</Link>
       <strong>{money(product.price.amount)}</strong>
       <div className="product-actions">
-        {canBuy && <select value={quantity} onChange={(event) => setQuantity(Number(event.target.value))} aria-label="Quantity">{[1,2,3,4,5].map((n) => <option key={n}>{n}</option>)}</select>}
+        {canBuy && <QuantitySelect value={quantity} onChange={setQuantity}/>}
         {canBuy ? <button onClick={() => cart.add({ productId: product.id, slug: product.slug, title: product.title, price: product.price.amount!, image: image || "" }, quantity)}>Add to cart</button> : <Link href={`/contact?product=${product.id}`}>Get a quote</Link>}
       </div>
     </div>

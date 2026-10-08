@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
+import { CircleHelp, MessagesCircle, Store, Truck, UserRound, WalletCards, type LucideIcon } from "lucide-react";
 import { BrandMarquee, SearchPanel } from "@/components/SharedSections";
 
 export const metadata: Metadata = { title: "General Information" };
@@ -13,19 +13,19 @@ const faqs = [
   ["What information should I send if I am unsure which part I need?", "Send your transmission code, vehicle year/make/model, existing part numbers, dimensions and clear photos."],
 ];
 export default function HelpPage() {
-  const cards = [
-    ["/assets/help-shipping.svg", "Shipping & Returns", "/shipping-returns"],
-    ["/assets/help-orders.svg", "Orders & Payments", "/orders-payments"],
-    ["/assets/help-store.svg", "Product & Store", "/bearings"],
-    ["/assets/help-about.svg", "About us", "/about"],
-    ["/assets/help-contact.svg", "Contact Us", "/contact"],
-    ["/assets/help-login.svg", "Log in / Sign up", "/login-sign-up"],
-  ] as const;
+  const cards: Array<[LucideIcon, string, string]> = [
+    [Truck, "Shipping & Returns", "/shipping-returns"],
+    [WalletCards, "Orders & Payments", "/orders-payments"],
+    [Store, "Product & Store", "/bearings"],
+    [CircleHelp, "About us", "/about"],
+    [MessagesCircle, "Contact Us", "/contact"],
+    [UserRound, "Log in / Sign up", "/login-sign-up"],
+  ];
 
   return <div className="help-page">
     <section className="content-section help-content">
       <h1>How can <em>we help?</em></h1>
-      <div className="help-grid">{cards.map(([icon, label, href]) => <Link key={label} href={href}><Image src={icon} width={202} height={87} alt=""/><h3>{label}</h3></Link>)}</div>
+      <div className="help-grid">{cards.map(([Icon, label, href]) => <Link key={label} href={href}><Icon aria-hidden="true"/><h3>{label}</h3></Link>)}</div>
       <div className="faq section"><h2>FAQs</h2>{faqs.map(([question, answer]) => <details key={question}><summary>{question}</summary><p>{answer}</p></details>)}</div>
     </section>
     <BrandMarquee/>

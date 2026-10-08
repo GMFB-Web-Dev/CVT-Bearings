@@ -37,6 +37,21 @@ export function money(amount: number | null | undefined) {
   return new Intl.NumberFormat("en-NZ", { style: "currency", currency: "NZD" }).format(amount);
 }
 
+export type ProductSection = "main-bearing-kits" | "pulley-bearings" | "primary-pulley-bearings";
+
+export function productSection(product: Product): ProductSection {
+  const haystack = [
+    product.title,
+    product.product_kind,
+    product.bearing_type,
+    product.applications.transmission_text,
+  ].filter(Boolean).join(" ").toLowerCase();
+
+  if (/primary|support/.test(haystack)) return "primary-pulley-bearings";
+  if (/pulley/.test(haystack)) return "pulley-bearings";
+  return "main-bearing-kits";
+}
+
 export function sectionProducts(section?: string) {
   if (!section) return products;
   const needle = section.replaceAll("-", " ").toLowerCase();

@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import type { Product } from "@/lib/catalog";
 import { ProductCard } from "@/components/ProductCard";
 
@@ -10,6 +11,7 @@ function unique(values: (string | null)[]) {
 }
 
 export function Catalogue({ initialProducts, initialQuery = "" }: { initialProducts: Product[]; initialQuery?: string }) {
+  const pathname = usePathname();
   const [query, setQuery] = useState(initialQuery);
   const [brands, setBrands] = useState<string[]>([]);
   const [types, setTypes] = useState<string[]>([]);
@@ -37,9 +39,14 @@ export function Catalogue({ initialProducts, initialQuery = "" }: { initialProdu
   const firstItem = (currentPage - 1) * perPage;
   const visible = filtered.slice(firstItem, firstItem + perPage);
   return <>
-    <div className="tag-row"><Link href="/bearings/main-bearing-kits">Main bearing kits</Link><Link href="/bearings/pulley-bearings">Pulley bearings</Link><Link href="/bearings/primary-pulley-bearings">Primary pulley bearings</Link><button onClick={() => { setBrands([]); setTypes([]); setVehicles([]); setPage(1); }}>Clear filters</button></div>
+    <nav className="tag-row" aria-label="Bearing categories">
+      <Link className={pathname === "/bearings/main-bearing-kits" ? "active" : ""} aria-current={pathname === "/bearings/main-bearing-kits" ? "page" : undefined} href="/bearings/main-bearing-kits">Main bearing kits</Link>
+      <Link className={pathname === "/bearings/pulley-bearings" ? "active" : ""} aria-current={pathname === "/bearings/pulley-bearings" ? "page" : undefined} href="/bearings/pulley-bearings">Pulley bearings</Link>
+      <Link className={pathname === "/bearings/primary-pulley-bearings" ? "active" : ""} aria-current={pathname === "/bearings/primary-pulley-bearings" ? "page" : undefined} href="/bearings/primary-pulley-bearings">Primary pulley bearings</Link>
+    </nav>
     <div className="catalogue-layout">
       <aside className="filters">
+        <div className="filters-heading"><strong>Filter products</strong><button type="button" onClick={() => { setQuery(""); setBrands([]); setTypes([]); setVehicles([]); setSort("featured"); setPage(1); }}>Clear filters</button></div>
         <Filter title="Filter by manufacturer" items={manufacturers} selected={brands} onToggle={(value) => toggle(value, brands, setBrands)}/>
         <Filter title="Filter by bearing type" items={bearingTypes} selected={types} onToggle={(value) => toggle(value, types, setTypes)}/>
         <Filter title="Filter by vehicle make" items={vehicleBrands} selected={vehicles} onToggle={(value) => toggle(value, vehicles, setVehicles)}/>
