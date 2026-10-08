@@ -1,0 +1,1 @@
+import type { Metadata } from "next";import { AccountPanel } from "@/components/AccountPanel";export const metadata:Metadata={title:"My Account"};export default function Page(){return <section className="account-page"><div className="page-width"><AccountPanel/></div></section>}

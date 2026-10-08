@@ -1,0 +1,50 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files (can opt-in for committing if needed)
+.env*
+!.env.example
+
+# vercel
+.vercel
+
+# local Supabase CLI state
+/supabase/.temp/
+
+# obsolete product artwork; catalogue photos come from the developer package
+/public/assets/figma-main-bearing-kit.jpg
+/public/assets/figma-primary-bearing.jpg
+/public/assets/figma-pulley-bearing.jpg
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
