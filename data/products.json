@@ -172,7 +172,7 @@
       "condition": "new",
       "images": [
         {
-          "path": "photos/products/cvtb-01j311-445b/embedded-l4.png",
+          "path": "photos/products/cvtb-01j311-445b/enhanced.png",
           "alt": "Bearing",
           "source": "spreadsheet_embedded_image",
           "source_cell": "L4",
@@ -1513,7 +1513,7 @@
       "condition": "new",
       "images": [
         {
-          "path": "photos/products/cvtb-hcvt357214/01-hcvt357214.jpg",
+          "path": "photos/products/cvtb-hcvt357214/enhanced.png",
           "alt": "Honda CVT Ball Bearing",
           "source": "uploaded_image_archive",
           "original_filename": "HCVT357214.jpg",
@@ -1608,7 +1608,7 @@
       "condition": "new",
       "images": [
         {
-          "path": "photos/products/cvtb-hcvt378218/01-hcvt378218.jpg",
+          "path": "photos/products/cvtb-hcvt378218/enhanced.png",
           "alt": "Pulley Bearing Honda CVT",
           "source": "uploaded_image_archive",
           "original_filename": "HCVT378218.jpg",
@@ -1765,7 +1765,7 @@
       "condition": "new",
       "images": [
         {
-          "path": "photos/products/cvtb-hcvt408117/01-hcvt408117.jpg",
+          "path": "photos/products/cvtb-hcvt408117/enhanced.png",
           "alt": "Pulley Bearing ID40 OD81 W17",
           "source": "uploaded_image_archive",
           "original_filename": "HCVT408117.jpg",
@@ -1961,7 +1961,7 @@
       "condition": "new",
       "images": [
         {
-          "path": "photos/products/cvtb-hcvt499019-8/01-hcvt499019-8.jpg",
+          "path": "photos/products/cvtb-hcvt499019-8/enhanced.png",
           "alt": "Bearing Honda CVT",
           "source": "uploaded_image_archive",
           "original_filename": "HCVT499019.8.jpg",
@@ -2139,7 +2139,7 @@
       "condition": "new",
       "images": [
         {
-          "path": "photos/products/cvtb-hcvt91103-rfh-003/01-hcvt91103-rfh-003-a.jpg",
+          "path": "photos/products/cvtb-hcvt91103-rfh-003/enhanced.png",
           "alt": "Tapered Bearing, Idler Shaft",
           "source": "uploaded_image_archive",
           "original_filename": "HCVT91103-RFH-003 a.jpg",
@@ -2530,7 +2530,7 @@
       "condition": "new",
       "images": [
         {
-          "path": "photos/products/cvtb-jf009508016/embedded-l33.png",
+          "path": "photos/products/cvtb-jf009508016/enhanced.png",
           "alt": "Primary Pulley Support Bearing",
           "source": "spreadsheet_embedded_image",
           "source_cell": "L33",
@@ -2608,7 +2608,7 @@
       "condition": "new",
       "images": [
         {
-          "path": "photos/products/cvtb-jf0096205rkd/01-jf0096205rkd.jpg",
+          "path": "photos/products/cvtb-jf0096205rkd/enhanced.png",
           "alt": "Pulley Support Bearing",
           "source": "uploaded_image_archive",
           "original_filename": "JF0096205RKD.jpg",
@@ -2696,7 +2696,7 @@
       "condition": "new",
       "images": [
         {
-          "path": "photos/products/cvtb-jf0096209/01-jf0096209.jpg",
+          "path": "photos/products/cvtb-jf0096209/enhanced.png",
           "alt": "Pulley Main Bearing SH",
           "source": "uploaded_image_archive",
           "original_filename": "JF0096209.jpg",
@@ -3187,7 +3187,7 @@
       "condition": null,
       "images": [
         {
-          "path": "photos/products/cvtb-jf010328415/embedded-l42.jpeg",
+          "path": "photos/products/cvtb-jf010328415/enhanced.png",
           "alt": "Pulley Support Bearing",
           "source": "spreadsheet_embedded_image",
           "source_cell": "L42",
@@ -3286,7 +3286,7 @@
       "condition": "new",
       "images": [
         {
-          "path": "photos/products/cvtb-jf0104510021-18/embedded-l44.jpeg",
+          "path": "photos/products/cvtb-jf0104510021-18/enhanced.png",
           "alt": "Pulley Main Bearing with Rebate",
           "source": "spreadsheet_embedded_image",
           "source_cell": "L44",
@@ -3371,7 +3371,7 @@
       "condition": "new",
       "images": [
         {
-          "path": "photos/products/cvtb-jf0106510017/01-jf0106510017.jpg",
+          "path": "photos/products/cvtb-jf0106510017/enhanced.png",
           "alt": "Primary Pulley Main Bearing",
           "source": "uploaded_image_archive",
           "original_filename": "JF0106510017.jpg",
