@@ -4,4 +4,71 @@ import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
-export function AuthForm(){const query=useSearchParams();const [signup,setSignup]=useState(query.get("mode")==="signup");const [message,setMessage]=useState("");const router=useRouter();async function submit(formData:FormData){const supabase=createClient();const email=String(formData.get("email"));const password=String(formData.get("password"));const result=signup?await supabase.auth.signUp({email,password,options:{data:{full_name:String(formData.get("name")||"")}}}):await supabase.auth.signInWithPassword({email,password});if(result.error){setMessage(result.error.message);return}setMessage(signup?"Check your email to confirm your account.":"Signed in successfully.");if(!signup&&result.data.user){window.dispatchEvent(new CustomEvent("cvt-authenticated",{detail:{userId:result.data.user.id}}));router.push("/account");router.refresh()}}return <div className="auth-card"><h1>{signup?"Create account":"Welcome back"}</h1><p>{signup?"Create an account to retain your cart, submit reviews and track orders.":"Sign in to see your CVT Bearings account."}</p><form action={submit}>{signup&&<input name="name" required placeholder="Full name"/>}<input name="email" type="email" required placeholder="Email address"/><input name="password" type="password" required minLength={8} placeholder="Password"/><button>{signup?"Sign up":"Sign in"}</button>{message&&<p className={message.includes("success")||message.includes("Check")?"notice":"error"}>{message}</p>}</form><button className="switch" onClick={()=>{setSignup(!signup);setMessage("")}}>{signup?"Already have an account? Sign in":"New customer? Create an account"}</button></div>}
+function safeNextPath(value: string | null) {
+  return value?.startsWith("/") && !value.startsWith("//") ? value : "/account";
+}
+
+export function AuthForm() {
+  const query = useSearchParams();
+  const [signup, setSignup] = useState(query.get("mode") === "signup");
+  const [message, setMessage] = useState("");
+  const router = useRouter();
+
+  async function submit(formData: FormData) {
+    const supabase = createClient();
+    const email = String(formData.get("email"));
+    const password = String(formData.get("password"));
+    const result = signup
+      ? await supabase.auth.signUp({
+          email,
+          password,
+          options: { data: { full_name: String(formData.get("name") || "") } },
+        })
+      : await supabase.auth.signInWithPassword({ email, password });
+
+    if (result.error) {
+      setMessage(result.error.message);
+      return;
+    }
+
+    setMessage(signup ? "Check your email to confirm your account." : "Signed in successfully.");
+    if (!signup && result.data.user) {
+      window.dispatchEvent(
+        new CustomEvent("cvt-authenticated", { detail: { userId: result.data.user.id } }),
+      );
+      router.replace(safeNextPath(query.get("next")));
+      router.refresh();
+    }
+  }
+
+  return (
+    <div className="auth-card">
+      <h1>{signup ? "Create account" : "Welcome back"}</h1>
+      <p>
+        {signup
+          ? "Create an account to retain your cart, submit reviews and track orders."
+          : "Sign in to see your CVT Bearings account."}
+      </p>
+      <form action={submit}>
+        {signup && <input name="name" required placeholder="Full name" />}
+        <input name="email" type="email" required placeholder="Email address" />
+        <input name="password" type="password" required minLength={8} placeholder="Password" />
+        <button>{signup ? "Sign up" : "Sign in"}</button>
+        {message && (
+          <p className={message.includes("success") || message.includes("Check") ? "notice" : "error"}>
+            {message}
+          </p>
+        )}
+      </form>
+      <button
+        className="switch"
+        onClick={() => {
+          setSignup(!signup);
+          setMessage("");
+        }}
+      >
+        {signup ? "Already have an account? Sign in" : "New customer? Create an account"}
+      </button>
+    </div>
+  );
+}
