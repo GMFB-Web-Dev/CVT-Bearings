@@ -29,22 +29,18 @@ function ActiveLink(props: ActiveLinkProps) {
   return <Suspense fallback={<Link href={href} className={className} onClick={onClick}>{children}</Link>}><PathAwareLink {...props}/></Suspense>;
 }
 
-const offerItems = [
-  "First Order",
-  "Get 10% Off Your First Order",
-  "Get 10% Off Your First Order",
-  "Get 10% Off Your First Order",
-  "Get 10% Off Your First Order",
-];
+const offerItems = Array(5).fill("Get 10% Off Your First Order");
 
 export function Header() {
   const [menu, setMenu] = useState(false);
+  const [offerVisible, setOfferVisible] = useState(true);
   const { count, setOpen } = useCart();
   return <>
-    <div className="offer-bar" aria-label="First order discount">
+    <div className={`offer-bar${offerVisible ? "" : " dismissed"}`} aria-label="First order discount" aria-hidden={!offerVisible}>
       <div className="offer-track">
-        {[0, 1].map((group) => <div className="offer-group" key={group} aria-hidden={group === 1}>{offerItems.map((item, index) => <span className={index === 0 ? "offer-label" : "offer-item"} key={`${group}-${index}`}>{item}</span>)}</div>)}
+        {[0, 1].map((group) => <div className="offer-group" key={group} aria-hidden={group === 1}>{offerItems.map((item, index) => <span className="offer-item" key={`${group}-${index}`}>{item}</span>)}</div>)}
       </div>
+      <button className="offer-dismiss" type="button" onClick={() => setOfferVisible(false)} aria-label="Close first order discount"><X size={18}/></button>
     </div>
     <div className="network-bar">
       <div className="network-links"><a href="https://cvtnz.co.nz">CVT<span>NZ</span></a><Link className="active" href="/">CVT<small>Bearings</small></Link><a href="https://cvt-parts.co.nz">CVT<small>Parts</small></a></div>
