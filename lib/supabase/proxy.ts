@@ -18,6 +18,24 @@ export async function updateSession(request: NextRequest) {
       },
     },
   );
-  await supabase.auth.getClaims();
+  const { data } = await supabase.auth.getClaims();
+
+  if (request.nextUrl.pathname === "/account" && !data?.claims?.sub) {
+    const loginUrl = request.nextUrl.clone();
+    loginUrl.pathname = "/login-sign-up";
+    loginUrl.search = "";
+    loginUrl.searchParams.set("next", "/account#wishlist");
+
+    const redirectResponse = NextResponse.redirect(loginUrl);
+    response.cookies.getAll().forEach((cookie) => redirectResponse.cookies.set(cookie));
+
+    for (const header of ["cache-control", "expires", "pragma"]) {
+      const value = response.headers.get(header);
+      if (value) redirectResponse.headers.set(header, value);
+    }
+
+    return redirectResponse;
+  }
+
   return response;
 }
