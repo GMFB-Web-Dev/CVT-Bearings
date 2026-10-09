@@ -35,10 +35,10 @@ export function PromoCards() {
     ["/assets/promo-diagnostic-tool.png", "Free CVT Diagnostic Tool", "Select your vehicle and symptoms for a fixed quote", "https://cvt.co.nz/cvt-symptom-diagnostic-tool/", "Try it now"],
     ["/assets/promo-signup.png", "Sign Up & Save", "Get 10% off your first CVT Bearings order", "/login-sign-up", "Sign up now"],
   ];
-  const carouselCards = Array.from({ length: cards.length }, (_, page) =>
-    Array.from({ length: 3 }, (_, position) => cards[(page + position) % cards.length]),
-  ).flat();
-  return <section className="promo-section section"><div className="page-width"><AutoCarousel className="promo-carousel" label="Promotions" desktopVisible={3} tabletVisible={2} fixedPageSize={3} interval={5500}>{carouselCards.map(([image, title, body, href, action], index) => <article className="promo-card" key={`${title}-${index}`}><Image src={image} width={1254} height={1254} sizes="(max-width: 650px) 100vw, (max-width: 1000px) 50vw, 33vw" alt={title}/><div><span><b>{title}</b><small>{body}</small></span><Link href={href}>{action}</Link></div></article>)}</AutoCarousel></div></section>;
+  const pageSize = 3;
+  const pageCount = Math.ceil(cards.length / pageSize);
+  const carouselCards = Array.from({ length: pageCount * pageSize }, (_, index) => cards[index % cards.length]);
+  return <section className="promo-section section"><div className="page-width"><AutoCarousel className="promo-carousel" label="Promotions" desktopVisible={pageSize} tabletVisible={2} fixedPageSize={pageSize} interval={5500}>{carouselCards.map(([image, title, body, href, action], index) => <article className="promo-card" key={`${title}-${index}`}><Image src={image} width={1254} height={1254} sizes="(max-width: 650px) 100vw, (max-width: 1000px) 50vw, 33vw" alt={title}/><div><span><b>{title}</b><small>{body}</small></span><Link href={href}>{action}</Link></div></article>)}</AutoCarousel></div></section>;
 }
 
 export function SearchPanel() {
