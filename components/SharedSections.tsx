@@ -1,8 +1,10 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Headphones, Wrench, Truck, Globe2, Mail, MapPin, Phone, Search } from "lucide-react";
+import { Headphones, Wrench, Truck, Globe2, Mail, MapPin, Phone } from "lucide-react";
 import { ContactForm } from "@/components/ContactForm";
 import { AutoCarousel } from "@/components/AutoCarousel";
+import { BearingFinder } from "@/components/BearingFinder";
+import { products } from "@/lib/catalog";
 
 export function ServiceStrip() {
   return <div className="service-strip"><div><Headphones/>Rapid Customer<br/>Service</div><div><Globe2/>Global Shipping<br/>Available</div><div><Wrench/>CVT Repairs<br/>Available</div><div><Truck/>Shipping Across New<br/>Zealand</div></div>;
@@ -42,7 +44,17 @@ export function PromoCards() {
 }
 
 export function SearchPanel() {
-  return <section className="find-panel"><div className="find-box"><h2>Find the right <em>bearing for you</em></h2><form action="/bearings"><label>Search for anything</label><div className="find-search"><input name="q" placeholder={'Search "Nissan", "24x7", or "Pulley Bearings" etc.'}/><button aria-label="Search"><Search size={18}/></button></div><label>Search by specifics</label><div className="specifics"><select name="brand"><option value="">Brand</option><option>Nissan</option><option>Toyota</option><option>Honda</option><option>Audi</option></select><label className="dimension-search"><input name="dimension" placeholder="Dimensions e.g. 24x7"/><Search size={16}/></label><select name="type"><option value="">Bearing Type</option><option>Ball</option><option>Roller</option><option>Pulley</option></select></div><button className="dark-button">Search by filter</button></form></div></section>;
+  const vehicleBrands = [...new Set(products.flatMap((product) => product.applications.vehicle_brands))].sort();
+  const bearingTypes = [
+    { value: "ball", label: "Ball bearing" },
+    { value: "roller", label: "Roller bearing" },
+    { value: "tapered roller", label: "Tapered roller" },
+    { value: "needle", label: "Needle bearing" },
+    { value: "thrust", label: "Thrust bearing" },
+    { value: "pulley", label: "Pulley bearing" },
+    { value: "kit", label: "Bearing kit" },
+  ];
+  return <BearingFinder vehicleBrands={vehicleBrands} bearingTypes={bearingTypes}/>;
 }
 
 export function BlogBanner() {
@@ -54,5 +66,5 @@ export function ContactIntro() {
 }
 
 export function ContactSection({ productId = "" }: { productId?: string }) {
-  return <div className="contact-block"><ContactIntro/><section id="contact-form" className="home-contact-form"><div className="page-width contact-form-layout"><ContactForm productId={productId}/><Image className="map-image" src="/assets/map.png" width={1730} height={1076} loading="eager" alt="Map showing CVT New Zealand near Tirau"/></div></section></div>;
+  return <div className="contact-block"><ContactIntro/><section id="contact-form" className="home-contact-form"><div className="page-width contact-form-layout"><ContactForm productId={productId}/><iframe className="map-image" title="CVT New Zealand at 125 State Highway 5, Tirau" src="https://www.google.com/maps?q=CVT+New+Zealand+Ltd,+125+State+Highway+5,+Tirau+3485,+New+Zealand&output=embed" loading="lazy" referrerPolicy="no-referrer-when-downgrade" allowFullScreen /></div></section></div>;
 }

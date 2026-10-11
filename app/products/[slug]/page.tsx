@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
@@ -9,6 +8,7 @@ import { ProductPurchase } from "@/components/ProductPurchase";
 import { ProductRating } from "@/components/ProductRating";
 import { PromoCards } from "@/components/SharedSections";
 import { Reviews } from "@/components/Reviews";
+import { ProductGallery } from "@/components/ProductGallery";
 
 export const instant = false;
 
@@ -36,11 +36,17 @@ export default async function ProductPage({
   const product = getProduct((await params).slug);
   if (!product) notFound();
 
-  const image = productImage(product);
-  const thumbnails = product.images
-    .map((_, index) => productImage(product, index))
-    .filter((value): value is string => Boolean(value))
-    .slice(0, 4);
+  const galleryImages = product.images.flatMap((image, index) => {
+    const src = productImage(product, index);
+    return src ? [{ src, alt: image.alt || product.title }] : [];
+  });
+  const bearingType = product.bearing_type?.replaceAll("_", " ");
+  const dimensions = [
+    product.dimensions.inner_diameter_mm != null ? `ID ${product.dimensions.inner_diameter_mm} mm` : null,
+    product.dimensions.outer_diameter_mm != null ? `OD ${product.dimensions.outer_diameter_mm} mm` : null,
+    product.dimensions.width_mm != null ? `Width ${product.dimensions.width_mm} mm` : null,
+  ].filter(Boolean);
+  const applications = [product.applications.transmission_text, ...product.applications.vehicle_brands].filter(Boolean);
 
   return (
     <div className="product-detail">
@@ -53,77 +59,46 @@ export default async function ProductPage({
           ]}
         />
         <div className="product-main">
-          <div className="product-gallery">
-            <div className="main-image">
-              {image ? (
-                <Image
-                  src={image}
-                  fill
-                  sizes="(max-width: 800px) 100vw, 50vw"
-                  alt={product.images[0]?.alt || product.title}
-                  priority
-                />
-              ) : (
-                <span className="product-image-placeholder">Image coming soon</span>
-              )}
-            </div>
-            {thumbnails.length > 0 && (
-              <div className="thumbs">
-                {thumbnails.map((thumbnail, index) => (
-                  <Image
-                    key={thumbnail}
-                    src={thumbnail}
-                    width={100}
-                    height={100}
-                    alt={product.images[index]?.alt || ""}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
+          <ProductGallery images={galleryImages} productTitle={product.title}/>
           <div className="product-info">
+            <p className="product-eyebrow">{[product.manufacturer, bearingType].filter(Boolean).join(" · ") || "CVT bearing"}</p>
             <h1>{product.title}</h1>
             <ProductRating productId={product.id}/>
             <div className="price">{money(product.price.amount)}</div>
+            <p className="price-note">NZD · Shipping calculated at checkout</p>
             <div className="spec-list">
-              <span>SKU: {product.sku || "On request"}</span>
-              <span>Condition: New</span>
-              <span>
-                Weight: {product.shipping.weight_kg
-                  ? product.shipping.weight_kg + " KGS"
-                  : "Contact us"}
-              </span>
-              <span>Minimum Purchase: 1 unit</span>
-              <span>Shipping: Calculated at Checkout</span>
+              <span><b>Item no.</b> {product.sku || product.id}</span>
+              <span><b>Manufacturer part:</b> {product.manufacturer_part_number || "On request"}</span>
+              <span><b>Condition:</b> New</span>
+              <span><b>Minimum purchase:</b> 1 unit</span>
             </div>
             <ProductPurchase product={product}/>
-            <div className="description-tabs">
-              <b>Product details</b>
-              <span>Payment options</span>
+            <div className="product-service-notes">
+              <p><strong>Need help confirming fitment?</strong> Match the part number, transmission code and dimensions before ordering.</p>
+              <Link href={`/contact?product=${product.id}`}>Ask our CVT team to confirm this bearing →</Link>
             </div>
-            <p className="product-description">{product.description}</p>
-            {product.dimensions.inner_diameter_mm != null && (
-              <p>
-                <b>Dimensions:</b> ID {product.dimensions.inner_diameter_mm} mm · OD{" "}
-                {product.dimensions.outer_diameter_mm} mm · Width{" "}
-                {product.dimensions.width_mm} mm
-              </p>
-            )}
-            <p>
-              <b>Application:</b>{" "}
-              {product.applications.transmission_text ||
-                product.applications.vehicle_brands.join(", ") ||
-                "Please confirm your transmission code before ordering."}
-            </p>
           </div>
         </div>
-        <Reviews productId={product.id}/>
+        <nav className="product-detail-tabs" aria-label="Product page sections">
+          <a href="#product-information">Product info</a>
+          <a href="#product-specifications">Specifications</a>
+          <a href="#product-fitment">Fitment</a>
+          <a href="#product-reviews">Reviews</a>
+        </nav>
+        <section className="product-information" aria-label="Product information">
+          <article id="product-information"><h2>Product info</h2><p>{product.description}</p></article>
+          <article id="product-specifications"><h2>Specifications</h2><dl>
+            <div><dt>Dimensions</dt><dd>{dimensions.length ? dimensions.join(" · ") : "Contact us for measurements"}</dd></div>
+            <div><dt>Manufacturer</dt><dd>{product.manufacturer || "Not specified"}</dd></div>
+            <div><dt>Bearing type</dt><dd>{bearingType || "CVT bearing"}</dd></div>
+            {product.shipping.weight_kg != null && <div><dt>Weight</dt><dd>{product.shipping.weight_kg} kg</dd></div>}
+          </dl></article>
+          <article id="product-fitment"><h2>Vehicle & transmission fitment</h2><p>{applications.length ? applications.join(" · ") : "Fitment is not listed for this product. Please send us your transmission code or the markings on the original bearing and we will help confirm it."}</p><Link href={`/contact?product=${product.id}`}>Confirm compatibility →</Link></article>
+        </section>
+        <div id="product-reviews"><Reviews productId={product.id}/></div>
       </div>
       <PopularTypesSection excludeProductId={product.id} activeSection={productSection(product)}/>
       <PromoCards/>
-      <div style={{ textAlign: "center", paddingBottom: 30 }}>
-        <Link href="/bearings">View full catalogue</Link>
-      </div>
     </div>
   );
 }

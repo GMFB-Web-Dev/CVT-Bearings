@@ -1,16 +1,44 @@
 "use client";
 
-import { useState } from "react";
-import { createClient } from "@/lib/supabase/client";
-import { SITE_KEY } from "@/lib/catalog";
+import { useRef, useState } from "react";
+import { submitEnquiry } from "@/lib/submit-enquiry";
 
 export function ContactForm({ productId = "" }: { productId?: string }) {
   const [message, setMessage] = useState("");
+  const [pending, setPending] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
   async function submit(formData: FormData) {
     setMessage("Sending…");
-    const supabase = createClient();
-    const { error } = await supabase.from("enquiries").insert({ site_key: SITE_KEY, product_id: productId || null, first_name: String(formData.get("first_name")), last_name: String(formData.get("last_name")), email: String(formData.get("email")), phone: String(formData.get("phone") || ""), service: String(formData.get("service")), message: String(formData.get("message")) });
-    setMessage(error ? "We couldn't send that yet. Please call 0800 288 695." : "Thanks — your enquiry has been received.");
+    setPending(true);
+    try {
+      await submitEnquiry({
+        kind: "contact",
+        productId,
+        firstName: String(formData.get("first_name") || ""),
+        lastName: String(formData.get("last_name") || ""),
+        email: String(formData.get("email") || ""),
+        phone: String(formData.get("phone") || ""),
+        service: String(formData.get("service") || "General enquiry"),
+        message: String(formData.get("message") || ""),
+        website: String(formData.get("website") || ""),
+      });
+      formRef.current?.reset();
+      setMessage("Thanks — your enquiry has been emailed to our team.");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "We couldn't send that yet. Please call 0800 288 695.");
+    } finally {
+      setPending(false);
+    }
   }
-  return <form className="form-grid" action={submit}><div className="field"><label>First name</label><input name="first_name" required placeholder="First Name"/></div><div className="field"><label>Last name</label><input name="last_name" required placeholder="Last Name"/></div><div className="field"><label>Email</label><input name="email" type="email" required placeholder="Email"/></div><div className="field"><label>Phone</label><input name="phone" placeholder="+64 213 345 6789"/></div><div className="field full"><label>Select a service</label><select name="service" defaultValue={productId ? "Product enquiry" : "General enquiry"}><option>General enquiry</option><option>Product enquiry</option><option>Bulk order</option><option>Shipping & returns</option><option>Order & payment</option></select></div><div className="field full"><label>Message</label><textarea name="message" required placeholder={productId ? `Please quote product ${productId}` : "Type your message here…"}/></div><label className="field full"><span><input type="checkbox" required/> I agree to the terms and conditions</span></label><div className="field full"><button className="button">Submit</button>{message && <p className={message.startsWith("Thanks") ? "notice" : "error"}>{message}</p>}</div></form>;
+  return <form className="form-grid" action={submit} ref={formRef}>
+    <div className="field"><label htmlFor="contact-first-name">First name</label><input id="contact-first-name" name="first_name" required maxLength={80} autoComplete="given-name" placeholder="First Name"/></div>
+    <div className="field"><label htmlFor="contact-last-name">Last name</label><input id="contact-last-name" name="last_name" required maxLength={80} autoComplete="family-name" placeholder="Last Name"/></div>
+    <div className="field"><label htmlFor="contact-email">Email</label><input id="contact-email" name="email" type="email" required maxLength={254} autoComplete="email" placeholder="Email"/></div>
+    <div className="field"><label htmlFor="contact-phone">Phone</label><input id="contact-phone" name="phone" type="tel" maxLength={40} autoComplete="tel" placeholder="+64 21 345 6789"/></div>
+    <div className="field full"><label htmlFor="contact-service">Select a service</label><select id="contact-service" name="service" defaultValue={productId ? "Product enquiry" : "General enquiry"}><option>General enquiry</option><option>Product enquiry</option><option>Bulk order</option><option>Shipping & returns</option><option>Order & payment</option></select></div>
+    <div className="field full"><label htmlFor="contact-message">Message</label><textarea id="contact-message" name="message" required maxLength={4000} placeholder={productId ? `Please quote product ${productId}` : "Type your message here…"}/></div>
+    <label className="honeypot" aria-hidden="true">Website<input name="website" tabIndex={-1} autoComplete="off"/></label>
+    <label className="field full"><span><input type="checkbox" required/> I agree to the terms and conditions</span></label>
+    <div className="field full"><button className="button" disabled={pending}>{pending ? "Sending…" : "Submit"}</button>{message && <p aria-live="polite" className={message.startsWith("Thanks") ? "notice" : message === "Sending…" ? "" : "error"}>{message}</p>}</div>
+  </form>;
 }

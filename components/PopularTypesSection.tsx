@@ -1,7 +1,12 @@
 import Link from "next/link";
-import { AutoCarousel } from "@/components/AutoCarousel";
-import { ProductCard } from "@/components/ProductCard";
-import { products, type ProductSection } from "@/lib/catalog";
+import { PopularTypesTabs } from "@/components/PopularTypesTabs";
+import { productSection, products, type ProductSection } from "@/lib/catalog";
+
+const popularTypes: Array<{ id: ProductSection; label: string }> = [
+  { id: "main-bearing-kits", label: "Main bearing kits" },
+  { id: "pulley-bearings", label: "Pulley bearings" },
+  { id: "primary-pulley-bearings", label: "Primary pulley bearings" },
+];
 
 export function PopularTypesSection({
   excludeProductId = "",
@@ -10,21 +15,23 @@ export function PopularTypesSection({
   excludeProductId?: string;
   activeSection?: ProductSection;
 }) {
-  const featured = products
-    .filter((product) => product.commerce.mode === "fixed_price" && product.id !== excludeProductId)
-    .slice(5, 15);
+  const categories = popularTypes.map((type) => ({
+    ...type,
+    products: products
+      .filter((product) =>
+        product.commerce.mode === "fixed_price"
+        && product.id !== excludeProductId
+        && productSection(product) === type.id)
+      .slice(0, 10),
+  }));
 
   return <section className="popular-types">
     <div className="page-width">
       <h2>Shop by popular <em>bearing types</em></h2>
-      <div className="type-tabs">
-        <Link className={activeSection === "main-bearing-kits" ? "active" : ""} aria-current={activeSection === "main-bearing-kits" ? "page" : undefined} href="/bearings/main-bearing-kits">Main bearing kits</Link>
-        <Link className={activeSection === "pulley-bearings" ? "active" : ""} aria-current={activeSection === "pulley-bearings" ? "page" : undefined} href="/bearings/pulley-bearings">Pulley bearings</Link>
-        <Link className={activeSection === "primary-pulley-bearings" ? "active" : ""} aria-current={activeSection === "primary-pulley-bearings" ? "page" : undefined} href="/bearings/primary-pulley-bearings">Primary pulley bearings</Link>
+      <PopularTypesTabs categories={categories} initialSection={activeSection}/>
+      <div className="popular-types-catalogue-link">
+        <Link className="button catalogue-button" href="/bearings">View full catalogue</Link>
       </div>
-      <AutoCarousel className="product-carousel five-up" label="Popular bearing types" desktopVisible={5} tabletVisible={2}>
-        {featured.map((product) => <ProductCard key={product.id} product={product}/>) }
-      </AutoCarousel>
     </div>
   </section>;
 }

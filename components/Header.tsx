@@ -2,10 +2,11 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { ChevronDown, Heart, Menu, Search, ShoppingCart, UserRound, X } from "lucide-react";
+import { ChevronDown, Heart, Menu, ShoppingCart, UserRound, X } from "lucide-react";
 import { Suspense, useState, type ReactNode } from "react";
 import { usePathname } from "next/navigation";
 import { useCart } from "@/components/CartProvider";
+import { SmartSearch } from "@/components/SmartSearch";
 
 type ActiveLinkProps = {
   href: string;
@@ -54,7 +55,7 @@ export function Header() {
           <div className="nav-dropdown"><ActiveLink href="/bearings" match={["/products"]} onClick={() => setMenu(false)}>Shop bearings <ChevronDown size={15}/></ActiveLink><div><ActiveLink href="/bearings/main-bearing-kits" onClick={() => setMenu(false)}>Main bearing kits</ActiveLink><ActiveLink href="/bearings/pulley-bearings" onClick={() => setMenu(false)}>Pulley bearings</ActiveLink><ActiveLink href="/bearings/primary-pulley-bearings" onClick={() => setMenu(false)}>Primary pulley bearings</ActiveLink></div></div>
           <ActiveLink href="/help" match={["/shipping-returns", "/orders-payments"]} onClick={() => setMenu(false)}>General information</ActiveLink>
         </nav>
-        <form className="header-search" action="/bearings"><input name="q" placeholder="Search Part"/><button aria-label="Search"><Search size={16}/></button></form>
+        <SmartSearch/>
         <Link href="/login-sign-up" className="mobile-account" aria-label="Account"><UserRound/></Link>
         <button className="menu-button" onClick={() => setMenu(!menu)} aria-label="Menu">{menu ? <X/> : <Menu/>}</button>
       </header>
