@@ -75,7 +75,7 @@ export function QuoteRequestModal({ product, open, onClose }: { product: Product
         <div className="field"><label htmlFor="quote-bearing">Bearing markings / dimensions</label><input id="quote-bearing" name="bearing_details" maxLength={500} placeholder="Part number or ID × OD × width"/></div>
         <div className="field full"><label htmlFor="quote-message">Anything else we should know?</label><textarea id="quote-message" name="message" maxLength={4000} placeholder="Transmission symptoms, required date, delivery location or other notes"/></div>
         <label className="honeypot" aria-hidden="true">Website<input name="website" tabIndex={-1} autoComplete="off"/></label>
-        <label className="quote-consent full"><input type="checkbox" required/> I agree to the terms and conditions and consent to being contacted about this quote.</label>
+        <label className="quote-consent terms-consent full"><input type="checkbox" required/> <span>I agree to the terms and conditions</span></label>
         <div className="quote-submit full"><button className="button" disabled={pending}><Send/>{pending ? "Sending…" : "Send quote request"}</button>{status && <p className={status.startsWith("Thanks") ? "notice" : "error"} aria-live="polite">{status}</p>}</div>
       </form>
     </section>

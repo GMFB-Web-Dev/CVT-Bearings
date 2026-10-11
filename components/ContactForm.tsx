@@ -38,7 +38,7 @@ export function ContactForm({ productId = "" }: { productId?: string }) {
     <div className="field full"><label htmlFor="contact-service">Select a service</label><select id="contact-service" name="service" defaultValue={productId ? "Product enquiry" : "General enquiry"}><option>General enquiry</option><option>Product enquiry</option><option>Bulk order</option><option>Shipping & returns</option><option>Order & payment</option></select></div>
     <div className="field full"><label htmlFor="contact-message">Message</label><textarea id="contact-message" name="message" required maxLength={4000} placeholder={productId ? `Please quote product ${productId}` : "Type your message here…"}/></div>
     <label className="honeypot" aria-hidden="true">Website<input name="website" tabIndex={-1} autoComplete="off"/></label>
-    <label className="field full"><span><input type="checkbox" required/> I agree to the terms and conditions</span></label>
+    <label className="field full terms-consent"><input type="checkbox" required/> <span>I agree to the terms and conditions</span></label>
     <div className="field full"><button className="button" disabled={pending}>{pending ? "Sending…" : "Submit"}</button>{message && <p aria-live="polite" className={message.startsWith("Thanks") ? "notice" : message === "Sending…" ? "" : "error"}>{message}</p>}</div>
   </form>;
 }

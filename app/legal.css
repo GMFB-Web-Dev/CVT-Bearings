@@ -1196,8 +1196,25 @@ select { cursor: pointer; }
 .quote-form .field input,
 .quote-form .field textarea { width: 100%; }
 .quote-form .field textarea { min-height: 105px; }
-.quote-consent { display: flex; align-items: flex-start; gap: 8px; font-size: 11px; line-height: 1.45; }
-.quote-consent input { margin-top: 1px; accent-color: var(--red); }
+.quote-consent,
+.terms-consent {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  font-size: 11px;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+.quote-consent input,
+.terms-consent input {
+  width: 15px;
+  height: 15px;
+  min-height: 15px;
+  flex: 0 0 15px;
+  margin: 0;
+  accent-color: var(--red);
+}
 .quote-submit { display: flex; align-items: center; gap: 18px; }
 .quote-submit .button { min-height: 48px; gap: 9px; background: var(--red-dark); }
 .quote-submit .button:hover,
