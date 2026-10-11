@@ -50,9 +50,18 @@ export function AuthForm() {
           : "Sign in to see your CVT Bearings account."}
       </p>
       <form action={submit}>
-        {signup && <input name="name" required placeholder="Full name" />}
-        <input name="email" type="email" required placeholder="Email address" />
-        <input name="password" type="password" required minLength={8} placeholder="Password" />
+        {signup && <label className="auth-field" htmlFor="auth-name">
+          <span>Full name</span>
+          <input id="auth-name" name="name" required autoComplete="name" placeholder="Your full name" />
+        </label>}
+        <label className="auth-field" htmlFor="auth-email">
+          <span>Email address</span>
+          <input id="auth-email" name="email" type="email" required autoComplete="email" inputMode="email" placeholder="you@example.com" />
+        </label>
+        <label className="auth-field" htmlFor="auth-password">
+          <span>Password</span>
+          <input id="auth-password" name="password" type="password" required minLength={8} autoComplete={signup ? "new-password" : "current-password"} placeholder="At least 8 characters" />
+        </label>
         <button>{signup ? "Sign up" : "Sign in"}</button>
         {message && (
           <p className={message.includes("success") || message.includes("Check") ? "notice" : "error"}>
