@@ -4,6 +4,11 @@ import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
+const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "https://cvt-bearings.vercel.app").replace(
+  /\/$/,
+  "",
+);
+
 function safeNextPath(value: string | null) {
   return value?.startsWith("/") && !value.startsWith("//") ? value : "/account";
 }
@@ -22,7 +27,10 @@ export function AuthForm() {
       ? await supabase.auth.signUp({
           email,
           password,
-          options: { data: { full_name: String(formData.get("name") || "") } },
+          options: {
+            data: { full_name: String(formData.get("name") || "") },
+            emailRedirectTo: `${SITE_URL}/account`,
+          },
         })
       : await supabase.auth.signInWithPassword({ email, password });
 
