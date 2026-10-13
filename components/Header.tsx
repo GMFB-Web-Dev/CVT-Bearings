@@ -86,7 +86,7 @@ export function Header() {
       <header className="main-header">
         <Link href="/" className="brand"><Image src={asset("assets/logo.png", "/assets/logo.png")} width={235} height={64} alt={c("copy-023", "CVT Bearings")} priority unoptimized /></Link>
         <nav className={menu ? "nav open" : "nav"} aria-label={c("copy-024", "Primary navigation")}>
-          <ActiveLink href="/" exact onClick={() => setMenu(false)}>{nav("/", c("copy-026", "Home"))}</ActiveLink>
+          <ActiveLink href="/" exact onClick={() => setMenu(false)}>{c("copy-026", "Home")}</ActiveLink>
           <div className="nav-dropdown"><ActiveLink href="/bearings" match={["/products"]} onClick={() => setMenu(false)}>{nav("/bearings", c("copy-028", "Shop bearings"))} <ChevronDown size={15}/></ActiveLink><div><ActiveLink href="/bearings/main-bearing-kits" onClick={() => setMenu(false)}>{nav("/bearings/main-bearing-kits", c("copy-030", "Main bearing kits"))}</ActiveLink><ActiveLink href="/bearings/pulley-bearings" onClick={() => setMenu(false)}>{nav("/bearings/pulley-bearings", c("copy-032", "Pulley bearings"))}</ActiveLink><ActiveLink href="/bearings/primary-pulley-bearings" onClick={() => setMenu(false)}>{nav("/bearings/primary-pulley-bearings", c("copy-034", "Primary pulley bearings"))}</ActiveLink></div></div>
           <ActiveLink href="/help" match={["/shipping-returns", "/orders-payments"]} onClick={() => setMenu(false)}>{nav("/help", c("copy-036", "General information"))}</ActiveLink>
         </nav>
