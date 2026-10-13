@@ -3,7 +3,7 @@ import { productCanCheckout, SITE_KEY } from "@/lib/catalog";
 import { getProductsUncached } from "@/lib/catalog-data";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getSiteUrl, getStripe, STRIPE_INTEGRATION_IDENTIFIER } from "@/lib/stripe";
+import { getNzGstTaxRateId, getSiteUrl, getStripe, STRIPE_INTEGRATION_IDENTIFIER } from "@/lib/stripe";
 
 type IncomingLine = { productId?: unknown; quantity?: unknown };
 
@@ -57,19 +57,17 @@ export async function POST(request: Request) {
   if (lines.some(({ product }) => !productCanCheckout(product!))) {
     return jsonError("A product is quote-only, out of stock, or no longer available. Remove it or request a quote.", 409);
   }
-  const gstTaxRateId = process.env.STRIPE_NZ_GST_TAX_RATE_ID;
-  if (!gstTaxRateId) {
-    return jsonError("Checkout tax configuration is not complete yet. Please contact CVT Bearings.", 503);
-  }
   const shippingRateId = process.env.STRIPE_NZ_SHIPPING_RATE_ID;
   if (!shippingRateId) {
     return jsonError("Checkout delivery configuration is not complete yet. Please contact CVT Bearings.", 503);
   }
 
   let stripe: ReturnType<typeof getStripe>;
+  let gstTaxRateId: string;
   let admin: ReturnType<typeof createAdminClient>;
   try {
     stripe = getStripe();
+    gstTaxRateId = await getNzGstTaxRateId(stripe);
     admin = createAdminClient();
   } catch (error) {
     console.error("Stripe checkout configuration error", error);
