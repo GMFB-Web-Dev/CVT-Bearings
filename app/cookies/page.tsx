@@ -1,10 +1,9 @@
 import { LegalPage } from "@/components/LegalPage";
+import { entry, getPage, section } from "@/lib/cms";
 
-export default function CookiesPage() {
-  return <LegalPage title="Cookie Settings">
-    <h2>Essential storage</h2>
-    <p>This website uses essential browser storage to keep your shopping cart and signed-in session working. These features cannot operate correctly without that storage.</p>
-    <h2>Preferences and analytics</h2>
-    <p>No optional advertising cookies are enabled in this build. If optional analytics or marketing services are introduced, this page will be updated with controls before they are activated.</p>
-  </LegalPage>;
+export default async function CookiesPage() {
+  const page = await getPage("/cookies");
+  const content = section(page, "app/cookies/page.tsx");
+  const c = (key: string, fallback: string) => entry(content, key, fallback);
+  return <LegalPage title={c("copy-001", "Cookie Settings")}><h2>{c("copy-002", "Essential storage")}</h2><p>{c("copy-003", "This website uses essential browser storage to keep your shopping cart and signed-in session working.")}</p><h2>{c("copy-004", "Preferences and analytics")}</h2><p>{c("copy-005", "No optional advertising cookies are enabled in this build.")}</p></LegalPage>;
 }

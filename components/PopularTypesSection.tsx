@@ -1,6 +1,9 @@
+"use client";
+
 import Link from "next/link";
 import { PopularTypesTabs } from "@/components/PopularTypesTabs";
 import { productSection, type Product, type ProductSection } from "@/lib/catalog";
+import { useCms } from "@/components/CmsProvider";
 
 const popularTypes: Array<{ id: ProductSection; label: string }> = [
   { id: "main-bearing-kits", label: "Main bearing kits" },
@@ -17,7 +20,10 @@ export function PopularTypesSection({
   activeSection?: ProductSection;
   products: Product[];
 }) {
-  const categories = popularTypes.map((type) => ({
+  const { copy } = useCms();
+  const c = (key: string, fallback: string) => copy("components/PopularTypesSection.tsx", key, fallback);
+  const cmsTypes: Array<{ id: ProductSection; label: string }> = popularTypes.map((type, index) => ({ ...type, label: c(`copy-${String(index + 1).padStart(3, "0")}`, type.label) }));
+  const categories = cmsTypes.map((type) => ({
     ...type,
     products: products
       .filter((product) =>
@@ -29,10 +35,10 @@ export function PopularTypesSection({
 
   return <section className="popular-types">
     <div className="page-width">
-      <h2>Shop by popular <em>bearing types</em></h2>
+      <h2>{c("copy-004", "Shop by popular")} <em>{c("copy-005", "bearing types")}</em></h2>
       <PopularTypesTabs categories={categories} initialSection={activeSection}/>
       <div className="popular-types-catalogue-link">
-        <Link className="button catalogue-button" href="/bearings">View full catalogue</Link>
+        <Link className="button catalogue-button" href={c("copy-006", "/bearings")}>{c("copy-007", "View full catalogue")}</Link>
       </div>
     </div>
   </section>;

@@ -5,16 +5,18 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { blogs } from "@/lib/blogs";
 
+export type BlogSummary = (typeof blogs)[number];
+
 const vehicleMakes = ["Nissan", "Toyota", "Subaru", "Mitsubishi", "Honda", "Suzuki"];
 const transmissions = ["JF011", "K313", "TR580", "JF015", "JF016", "JF017"];
 
-export function BlogCatalogue() {
+export function BlogCatalogue({ initialBlogs = blogs }: { initialBlogs?: BlogSummary[] }) {
   const [query, setQuery] = useState("");
   const [topics, setTopics] = useState<string[]>([]);
   const [vehicles, setVehicles] = useState<string[]>([]);
   const [gearboxes, setGearboxes] = useState<string[]>([]);
   const [sort, setSort] = useState("popularity");
-  const library = useMemo(() => Array.from({ length: 12 }, (_, index) => ({ ...blogs[index % blogs.length], vehicle: vehicleMakes[index % vehicleMakes.length], transmission: transmissions[index % transmissions.length], instance: index })), []);
+  const library = useMemo(() => Array.from({ length: 12 }, (_, index) => ({ ...initialBlogs[index % initialBlogs.length], vehicle: vehicleMakes[index % vehicleMakes.length], transmission: transmissions[index % transmissions.length], instance: index })), [initialBlogs]);
   const toggle = (value: string, selected: string[], update: (values: string[]) => void) => update(selected.includes(value) ? selected.filter((item) => item !== value) : [...selected, value]);
   const visible = useMemo(() => {
     const needle = query.trim().toLowerCase();
@@ -24,7 +26,7 @@ export function BlogCatalogue() {
 
   return <div className="blog-catalogue-layout">
     <aside className="filters blog-filters">
-      <Filter title="Filter by article topic" items={[...new Set(blogs.map((blog) => blog.tag))]} selected={topics} onToggle={(value) => toggle(value, topics, setTopics)}/>
+      <Filter title="Filter by article topic" items={[...new Set(initialBlogs.map((blog) => blog.tag))]} selected={topics} onToggle={(value) => toggle(value, topics, setTopics)}/>
       <Filter title="Filter by vehicle make" items={vehicleMakes} selected={vehicles} onToggle={(value) => toggle(value, vehicles, setVehicles)}/>
       <Filter title="Filter by transmission" items={transmissions} selected={gearboxes} onToggle={(value) => toggle(value, gearboxes, setGearboxes)}/>
     </aside>
