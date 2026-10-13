@@ -17,10 +17,9 @@ The app expects these local variables:
 NEXT_PUBLIC_SUPABASE_URL=...
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=...
 NEXT_PUBLIC_GTM_ID=GTM-XXXXXXX # public Google Tag Manager web-container ID
-SUPABASE_SERVICE_ROLE_KEY=... # server-only; required for order/webhook writes
 NEXT_PUBLIC_PAYLOAD_URL=https://payload.gmfb.co.nz
 PAYLOAD_TENANT_SLUG=cvt-bearings
-REVALIDATION_SECRET=... # server-only; must match the Payload webhook secret
+REVALIDATION_SECRET=... # server-only; Payload webhook and scoped order-RPC credential
 ```
 
 Product-review photos and videos are uploaded directly to a private Cloudflare

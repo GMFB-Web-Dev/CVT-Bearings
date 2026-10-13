@@ -19,18 +19,19 @@ Use the CVT Bearings Stripe account, starting in test mode.
 
 ## Vercel environment variables
 
-Add these to Preview and Production, using test-mode values until the test checkout has been verified. Store the Stripe secret, webhook secret, and Supabase service-role key as Vercel **Secret** variables; the tax/shipping IDs and public site URL can be **Config** variables.
+Add these to Preview and Production, using test-mode values until the test checkout has been verified. Store the Stripe secret and webhook secret as Vercel **Secret** variables; the tax/shipping IDs and public site URL can be **Config** variables.
 
 ```text
 STRIPE_SECRET_KEY=rk_test_...
 STRIPE_WEBHOOK_SECRET=whsec_...
 STRIPE_NZ_GST_TAX_RATE_ID=txr_...
 STRIPE_NZ_SHIPPING_RATE_ID=shr_...
-SUPABASE_SERVICE_ROLE_KEY=...
 NEXT_PUBLIC_SITE_URL=https://cvt-bearings.vercel.app
 ```
 
-The service-role key is server-only and is used only to create order records and process signed Stripe webhook events. Never prefix it with `NEXT_PUBLIC_`.
+Order writes use narrowly scoped Supabase database functions authenticated with the existing server-only `REVALIDATION_SECRET`; the browser cannot call them successfully and no Supabase service-role key is required. Test-mode Stripe keys may omit `STRIPE_NZ_SHIPPING_RATE_ID`, in which case Checkout shows a $0 **Sandbox test delivery** option so the full sandbox workflow can be exercised. Live-mode keys never use that fallback and require an approved `shr_...` rate.
+
+`REVALIDATION_SECRET` is stored in Supabase only as a SHA-256 hash. If the Vercel value is rotated, update the corresponding hash in `private.storefront_server_secrets` in the same deployment.
 
 ## Local webhook test
 

@@ -1,6 +1,6 @@
 import type Stripe from "stripe";
 import { SITE_KEY } from "@/lib/catalog";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { cancelStorefrontCheckoutOrder, completeStorefrontCheckoutOrder } from "@/lib/storefront-orders";
 import { getStripe } from "@/lib/stripe";
 
 function dollars(cents: number | null | undefined) {
@@ -12,41 +12,27 @@ async function markPaid(session: Stripe.Checkout.Session) {
   if (!orderId || session.metadata?.site_key !== SITE_KEY || session.payment_status === "unpaid") return;
   if (session.amount_total == null) throw new Error("Paid Checkout Session is missing amount_total.");
 
-  const admin = createAdminClient();
   const paymentIntentId = typeof session.payment_intent === "string" ? session.payment_intent : session.payment_intent?.id;
   const shipping = session.collected_information?.shipping_details;
   const shippingAddress = shipping ? { name: shipping.name, address: shipping.address } : null;
 
-  const { error } = await admin.from("orders").update({
-    status: "paid",
-    subtotal_nzd: dollars(session.amount_subtotal),
-    shipping_nzd: dollars(session.total_details?.amount_shipping),
-    tax_nzd: dollars(session.total_details?.amount_tax),
-    total_nzd: dollars(session.amount_total),
-    shipping_address: shippingAddress,
-    customer_email: session.customer_details?.email || session.customer_email,
-    stripe_payment_intent_id: paymentIntentId || null,
-    paid_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  }).eq("id", orderId).eq("site_key", SITE_KEY).neq("status", "cancelled");
-
-  if (error) throw error;
-
-  const userId = session.metadata?.user_id;
-  if (userId) {
-    const { error: cartError } = await admin.from("carts").update({ status: "converted", updated_at: new Date().toISOString() })
-      .eq("site_key", SITE_KEY).eq("user_id", userId).eq("status", "active");
-    if (cartError) throw cartError;
-  }
+  const completed = await completeStorefrontCheckoutOrder({
+    orderId,
+    subtotalNzd: dollars(session.amount_subtotal),
+    shippingNzd: dollars(session.total_details?.amount_shipping),
+    taxNzd: dollars(session.total_details?.amount_tax),
+    totalNzd: dollars(session.amount_total),
+    shippingAddress,
+    customerEmail: session.customer_details?.email || session.customer_email || null,
+    paymentIntentId: paymentIntentId || null,
+  });
+  if (!completed) throw new Error("The paid Checkout Session did not match an active order.");
 }
 
 async function markFailed(session: Stripe.Checkout.Session) {
   const orderId = session.metadata?.order_id || session.client_reference_id;
   if (!orderId || session.metadata?.site_key !== SITE_KEY) return;
-  const admin = createAdminClient();
-  const { error } = await admin.from("orders").update({ status: "cancelled", updated_at: new Date().toISOString() })
-    .eq("id", orderId).eq("site_key", SITE_KEY).in("status", ["draft", "pending"]);
-  if (error) throw error;
+  await cancelStorefrontCheckoutOrder(orderId);
 }
 
 export async function POST(request: Request) {

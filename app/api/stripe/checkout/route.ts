@@ -1,8 +1,12 @@
 import type Stripe from "stripe";
 import { productCanCheckout, SITE_KEY } from "@/lib/catalog";
 import { getProductsUncached } from "@/lib/catalog-data";
+import {
+  attachStorefrontCheckoutSession,
+  cancelStorefrontCheckoutOrder,
+  createStorefrontCheckoutOrder,
+} from "@/lib/storefront-orders";
 import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from "@/lib/supabase/admin";
 import { getNzGstTaxRateId, getSiteUrl, getStripe, STRIPE_INTEGRATION_IDENTIFIER } from "@/lib/stripe";
 
 type IncomingLine = { productId?: unknown; quantity?: unknown };
@@ -57,50 +61,45 @@ export async function POST(request: Request) {
   if (lines.some(({ product }) => !productCanCheckout(product!))) {
     return jsonError("A product is quote-only, out of stock, or no longer available. Remove it or request a quote.", 409);
   }
-  const shippingRateId = process.env.STRIPE_NZ_SHIPPING_RATE_ID;
-  if (!shippingRateId) {
-    return jsonError("Checkout delivery configuration is not complete yet. Please contact CVT Bearings.", 503);
-  }
-
   let stripe: ReturnType<typeof getStripe>;
   let gstTaxRateId: string;
-  let admin: ReturnType<typeof createAdminClient>;
   try {
     stripe = getStripe();
     gstTaxRateId = await getNzGstTaxRateId(stripe);
-    admin = createAdminClient();
   } catch (error) {
     console.error("Stripe checkout configuration error", error);
     return jsonError("Secure checkout is not configured yet. Please contact CVT Bearings.", 503);
   }
 
-  const subtotal = lines.reduce((sum, line) => sum + line.product!.price.amount! * line.quantity, 0);
-  const { data: order, error: orderError } = await admin.from("orders").insert({
-    site_key: SITE_KEY,
-    user_id: user.id,
-    status: "draft",
-    subtotal_nzd: subtotal,
-    total_nzd: subtotal,
-  }).select("id").single();
-
-  if (orderError || !order) {
-    console.error("Stripe checkout order creation failed", orderError);
-    return jsonError("We could not prepare your order. Please try again.", 500);
+  const shippingRateId = process.env.STRIPE_NZ_SHIPPING_RATE_ID?.trim();
+  const stripeSecretKey = process.env.STRIPE_SECRET_KEY || "";
+  const isStripeTestMode = /^(?:sk|rk)_test_/.test(stripeSecretKey);
+  if (!shippingRateId && !isStripeTestMode) {
+    return jsonError("Checkout delivery configuration is not complete yet. Please contact CVT Bearings.", 503);
   }
 
-  const { error: itemError } = await admin.from("order_items").insert(lines.map(({ product, quantity }) => ({
-    site_key: SITE_KEY,
-    order_id: order.id,
-    product_id: product!.id,
-    product_title: product!.title,
-    sku: product!.sku,
-    quantity,
-    unit_price_nzd: product!.price.amount,
-  })));
+  const shippingOptions: Stripe.Checkout.SessionCreateParams.ShippingOption[] = shippingRateId
+    ? [{ shipping_rate: shippingRateId }]
+    : [{
+        shipping_rate_data: {
+          type: "fixed_amount",
+          fixed_amount: { amount: 0, currency: "nzd" },
+          display_name: "Sandbox test delivery",
+          tax_behavior: "inclusive",
+        },
+      }];
 
-  if (itemError) {
-    await admin.from("orders").update({ status: "cancelled" }).eq("id", order.id).eq("site_key", SITE_KEY);
-    console.error("Stripe checkout order items failed", itemError);
+  let orderId: string;
+  try {
+    orderId = await createStorefrontCheckoutOrder(user.id, lines.map(({ product, quantity }) => ({
+      product_id: product!.id,
+      product_title: product!.title,
+      sku: product!.sku || null,
+      quantity,
+      unit_price_nzd: product!.price.amount!,
+    })));
+  } catch (error) {
+    console.error("Stripe checkout order creation failed", error);
     return jsonError("We could not prepare your order. Please try again.", 500);
   }
 
@@ -126,31 +125,39 @@ export async function POST(request: Request) {
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       integration_identifier: STRIPE_INTEGRATION_IDENTIFIER,
-      client_reference_id: order.id,
+      client_reference_id: orderId,
       customer_email: user.email,
       customer_creation: "always",
       line_items: lineItems,
       billing_address_collection: "auto",
       shipping_address_collection: { allowed_countries: ["NZ"] },
-      shipping_options: [{ shipping_rate: shippingRateId }],
+      shipping_options: shippingOptions,
       phone_number_collection: { enabled: true },
       consent_collection: { terms_of_service: "required" },
       custom_text: {
         shipping_address: { message: "Enter the New Zealand delivery address for this order." },
         submit: { message: "Your payment is processed securely by Stripe." },
       },
-      metadata: { order_id: order.id, user_id: user.id, site_key: SITE_KEY },
-      payment_intent_data: { metadata: { order_id: order.id, user_id: user.id, site_key: SITE_KEY } },
+      metadata: { order_id: orderId, user_id: user.id, site_key: SITE_KEY },
+      payment_intent_data: { metadata: { order_id: orderId, user_id: user.id, site_key: SITE_KEY } },
       success_url: `${siteUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${siteUrl}/cart?checkout=cancelled`,
       submit_type: "pay",
     });
 
     if (!session.url) throw new Error("Stripe did not return a Checkout URL.");
-    await admin.from("orders").update({ stripe_checkout_session_id: session.id, status: "pending" }).eq("id", order.id).eq("site_key", SITE_KEY);
+    const attached = await attachStorefrontCheckoutSession(orderId, session.id);
+    if (!attached) {
+      await stripe.checkout.sessions.expire(session.id);
+      throw new Error("The Checkout Session could not be attached to its order.");
+    }
     return Response.json({ url: session.url });
   } catch (error) {
-    await admin.from("orders").update({ status: "cancelled" }).eq("id", order.id).eq("site_key", SITE_KEY);
+    try {
+      await cancelStorefrontCheckoutOrder(orderId);
+    } catch (cancelError) {
+      console.error("Failed to cancel the incomplete checkout order", cancelError);
+    }
     console.error("Stripe Checkout Session creation failed", error);
     return jsonError("Stripe could not start checkout. Please try again.", 502);
   }
