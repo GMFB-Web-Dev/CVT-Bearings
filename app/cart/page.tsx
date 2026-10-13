@@ -1,1 +1,9 @@
-import type { Metadata } from "next";import { CartPage } from "@/components/CartPage";export const metadata:Metadata={title:"Cart"};export default function Page(){return <section className="cart-page"><CartPage/></section>}
+import type { Metadata } from "next";
+import { CartPage } from "@/components/CartPage";
+
+export const metadata: Metadata = { title: "Cart" };
+
+export default async function Page({ searchParams }: { searchParams: Promise<{ checkout?: string }> }) {
+  const { checkout } = await searchParams;
+  return <section className="cart-page"><CartPage checkoutCancelled={checkout === "cancelled"}/></section>;
+}

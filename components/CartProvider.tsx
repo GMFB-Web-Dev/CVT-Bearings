@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import { SITE_KEY } from "@/lib/catalog";
 
 export type CartLine = { productId: string; slug: string; title: string; price: number; image: string; quantity: number };
-type CartValue = { lines: CartLine[]; count: number; total: number; add: (line: Omit<CartLine, "quantity">, quantity?: number) => void; update: (id: string, quantity: number) => void; remove: (id: string) => void; open: boolean; setOpen: (open: boolean) => void };
+type CartValue = { lines: CartLine[]; count: number; total: number; add: (line: Omit<CartLine, "quantity">, quantity?: number) => void; update: (id: string, quantity: number) => void; remove: (id: string) => void; clear: () => void; open: boolean; setOpen: (open: boolean) => void };
 const CartContext = createContext<CartValue | null>(null);
 
 async function saveCart(lines: CartLine[], userId: string) {
@@ -102,6 +102,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     add(line, quantity = 1) { commit((current) => current.some((item) => item.productId === line.productId) ? current.map((item) => item.productId === line.productId ? { ...item, quantity: item.quantity + quantity } : item) : [...current, { ...line, quantity }]); setOpen(true); },
     update(id, quantity) { commit((current) => current.map((line) => line.productId === id ? { ...line, quantity: Math.max(1, quantity) } : line)); },
     remove(id) { commit((current) => current.filter((line) => line.productId !== id)); },
+    clear() { commit(() => []); },
     open, setOpen,
   }), [lines, open, commit]);
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

@@ -17,7 +17,7 @@ export function CartDrawer() {
           <div><Link href={`/products/${line.slug}`} onClick={() => setOpen(false)}>{line.title}</Link><strong>{money(line.price * line.quantity)}</strong><div className="qty"><button onClick={() => update(line.productId, line.quantity - 1)}><Minus size={13}/></button><span>{line.quantity}</span><button onClick={() => update(line.productId, line.quantity + 1)}><Plus size={13}/></button></div></div>
           <button className="remove" onClick={() => remove(line.productId)}>Remove</button>
         </article>)}</div>
-        <div className="cart-summary"><p><span>Subtotal</span><strong>{money(total)}</strong></p><small>Shipping and GST are calculated at checkout.</small><Link className="button wide" href="/cart" onClick={() => setOpen(false)}>View cart</Link></div>
+        <div className="cart-summary"><p><span>Subtotal</span><strong>{money(total)}</strong></p><small>Prices include GST. Shipping is calculated at checkout.</small><Link className="button wide" href="/cart" onClick={() => setOpen(false)}>View cart</Link></div>
       </>}
     </aside>
   </div>;

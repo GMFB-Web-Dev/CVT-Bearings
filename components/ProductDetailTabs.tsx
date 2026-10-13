@@ -62,9 +62,9 @@ export function ProductDetailTabs({
           aria-labelledby={`${id}-payments-tab`}
           className="product-tab-panel payment-options-panel"
         >
-          <div><CreditCard aria-hidden="true"/><span><strong>Flexible payment options</strong><small>Example methods planned for secure online checkout.</small></span></div>
-          <Image src="/assets/payment-logos.png" width={520} height={53} alt="Example payment methods including major cards, PayPal, Afterpay, Apple Pay and Google Pay"/>
-          <div><ShieldCheck aria-hidden="true"/><span><strong>Secure checkout</strong><small>Final availability, freight and order total will be confirmed before payment.</small></span></div>
+          <div><CreditCard aria-hidden="true"/><span><strong>Flexible payment options</strong><small>Stripe shows the payment methods available for your device and location at checkout.</small></span></div>
+          <Image src="/assets/payment-logos.png" width={520} height={53} alt="Common payment methods; final availability is shown in Stripe Checkout"/>
+          <div><ShieldCheck aria-hidden="true"/><span><strong>Secure Stripe Checkout</strong><small>Prices include GST. Delivery and the final order total are shown before payment.</small></span></div>
           <Link href="/orders-payments">Read orders and payment information →</Link>
         </section>
       )}

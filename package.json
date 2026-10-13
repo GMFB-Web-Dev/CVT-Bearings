@@ -18,7 +18,8 @@
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "react-email": "6.11.1",
-    "resend": "6.32.1"
+    "resend": "6.32.1",
+    "stripe": "22.6.0"
   },
   "devDependencies": {
     "@tailwindcss/turbopack": "^4",
