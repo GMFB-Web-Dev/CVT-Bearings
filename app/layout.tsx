@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { GoogleTagManager } from "@next/third-parties/google";
 import { Geist } from "next/font/google";
 import "./globals.css";
 import "./legal.css";
@@ -8,6 +9,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { CartDrawer } from "@/components/CartDrawer";
 import { CmsProvider } from "@/components/CmsProvider";
+import { GtmPageView } from "@/components/GtmPageView";
 import { assetURL, getNavigation, getSiteSettings } from "@/lib/cms";
 import type { CSSProperties } from "react";
 
@@ -29,6 +31,8 @@ export const instant = false;
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
   const [settings, navigation] = await Promise.all([getSiteSettings(), getNavigation()]);
+  const configuredGtmId = process.env.NEXT_PUBLIC_GTM_ID?.trim();
+  const gtmId = configuredGtmId && /^GTM-[A-Z0-9]+$/.test(configuredGtmId) ? configuredGtmId : null;
   const backgrounds = {
     "--cms-hero": `url("${assetURL(settings, "assets/hero.jpg", "/assets/hero.jpg")}")`,
     "--cms-facility": `url("${assetURL(settings, "assets/facility.png", "/assets/facility.png")}")`,
@@ -43,7 +47,12 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geistSans.variable}`}
       data-scroll-behavior="smooth"
     >
-      <body style={backgrounds}><CmsProvider settings={settings} navigation={navigation}><CartProvider><Header/><main>{children}</main><Footer/><CartDrawer/></CartProvider></CmsProvider></body>
+      {gtmId && <GoogleTagManager gtmId={gtmId}/>}
+      <body style={backgrounds}>
+        {gtmId && <noscript><iframe src={`https://www.googletagmanager.com/ns.html?id=${encodeURIComponent(gtmId)}`} height="0" width="0" style={{ display: "none", visibility: "hidden" }} title="Google Tag Manager"/></noscript>}
+        {gtmId && <GtmPageView/>}
+        <CmsProvider settings={settings} navigation={navigation}><CartProvider><Header/><main>{children}</main><Footer/><CartDrawer/></CartProvider></CmsProvider>
+      </body>
     </html>
   );
 }

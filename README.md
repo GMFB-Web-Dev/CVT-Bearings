@@ -16,6 +16,7 @@ The app expects these local variables:
 ```dotenv
 NEXT_PUBLIC_SUPABASE_URL=...
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=...
+NEXT_PUBLIC_GTM_ID=GTM-XXXXXXX # public Google Tag Manager web-container ID
 SUPABASE_SERVICE_ROLE_KEY=... # server-only; required for order/webhook writes
 NEXT_PUBLIC_PAYLOAD_URL=https://payload.gmfb.co.nz
 PAYLOAD_TENANT_SLUG=cvt-bearings
@@ -47,6 +48,19 @@ Public CMS and catalogue reads use a 60-second cache lifetime with tenant-scoped
 npm run lint
 npm run build
 ```
+
+## Google Tag Manager
+
+Set `NEXT_PUBLIC_GTM_ID` to the Web container ID issued by Google Tag Manager,
+for example `GTM-XXXXXXX`, then redeploy the Vercel Production environment. A
+missing or malformed ID disables GTM. The root layout loads the container on
+every route and includes Google's `<noscript>` fallback.
+
+The initial document load is available to GTM's standard All Pages trigger.
+Later Next.js navigations push a `virtual_page_view` event to `dataLayer` with
+`page_path`, `page_location`, and `page_title`. In GTM, use a Custom Event
+trigger named `virtual_page_view` for SPA page-view tags; do not also add a
+History Change page-view trigger, because that would double count navigation.
 
 ## Stripe Checkout
 
