@@ -3,7 +3,7 @@ import { SITE_KEY, productCanCheckout, type Product } from "@/lib/catalog";
 
 export const PRODUCT_CACHE_TAG = `tenant:${SITE_KEY}:products`;
 export const TENANT_CACHE_TAG = `tenant:${SITE_KEY}`;
-const PRODUCT_COLUMNS = "site_key,id,slug,sku,title,description,product_kind,bearing_type,manufacturer,manufacturer_part_number,vehicle_brands,transmission_text,price_nzd,commerce_mode,dimensions,images,visible,track_inventory,stock_quantity,stock_status,catalogue_data";
+const PRODUCT_COLUMNS = "site_key,id,slug,sku,title,description,product_kind,bearing_type,manufacturer,manufacturer_part_number,vehicle_brands,transmission_text,price_nzd,commerce_mode,dimensions,images,visible,track_inventory,stock_quantity,stock_status,catalogue_data,updated_at";
 type JsonRecord = Record<string, unknown>;
 type ProductRow = JsonRecord & { id: string; slug: string; site_key: string; visible: boolean; title: string };
 
@@ -24,6 +24,7 @@ function mapProduct(row: ProductRow): Product {
   const commerceMode = row.commerce_mode === "fixed_price" ? "fixed_price" : "quote";
   const product: Product = {
     id: String(row.id), sku: text(row.sku), slug: String(row.slug), title: text(row.title, "CVT bearing")!,
+    updated_at: text(row.updated_at),
     description: text(row.description, text(legacy.description, `${row.title}. Contact our team to confirm application and fitment before ordering.`))!,
     product_kind: text(row.product_kind, text(legacy.product_kind, "bearing"))!, bearing_type: text(row.bearing_type, text(legacy.bearing_type)),
     manufacturer: text(row.manufacturer, text(legacy.manufacturer)), manufacturer_part_number: text(row.manufacturer_part_number, text(legacy.manufacturer_part_number)),

@@ -5,6 +5,7 @@ export interface Product {
   sku: string | null;
   slug: string;
   title: string;
+  updated_at: string | null;
   description: string;
   product_kind: string;
   bearing_type: string | null;

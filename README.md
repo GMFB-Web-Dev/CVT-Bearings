@@ -62,6 +62,13 @@ Later Next.js navigations push a `virtual_page_view` event to `dataLayer` with
 trigger named `virtual_page_view` for SPA page-view tags; do not also add a
 History Change page-view trigger, because that would double count navigation.
 
+## Search indexing
+
+Next.js generates `/sitemap.xml` from published Payload pages and the visible
+live Supabase catalogue. Product entries include their current update timestamp
+and primary image where available. `/robots.txt` points crawlers to the sitemap
+and excludes account, authentication, cart, checkout, and API routes.
+
 ## Stripe Checkout
 
 Stripe-hosted Checkout is implemented for signed-in customers purchasing fixed-price products. Catalogue prices are treated as GST-inclusive: Checkout itemises the included 15% NZ GST without adding it again. The signed webhook stores Stripe's final `amount_total` as the authoritative order total, and the purchased cart is cleared only after the returning Checkout Session is confirmed as paid for the signed-in customer.
