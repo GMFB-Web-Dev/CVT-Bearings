@@ -8,7 +8,7 @@ Use the CVT Bearings Stripe account, starting in test mode.
 
 1. Create an active, inclusive 15% NZ GST tax rate and copy its `txr_...` ID. Applying this rate itemises the included GST without increasing the catalogue price.
 2. Create the approved New Zealand delivery rate and copy its `shr_...` ID.
-3. Set the business name, branding, support details, privacy-policy URL and terms URL in Stripe Checkout settings.
+3. Set the business name, branding, support details, privacy-policy URL and terms URL in Stripe Checkout settings before enabling live payments. The app does not force Stripe's terms checkbox while the sandbox public profile is incomplete.
 4. Leave payment methods managed in Stripe. The app deliberately does not pass `payment_method_types`, so Checkout can select eligible methods dynamically.
 5. Create a restricted server key with the minimum access required to create/retrieve Checkout Sessions and read the configured tax/shipping rates.
 6. Add a webhook endpoint at `https://cvt-bearings.vercel.app/api/stripe/webhook` for:

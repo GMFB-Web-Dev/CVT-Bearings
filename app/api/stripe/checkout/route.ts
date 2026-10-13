@@ -133,7 +133,6 @@ export async function POST(request: Request) {
       shipping_address_collection: { allowed_countries: ["NZ"] },
       shipping_options: shippingOptions,
       phone_number_collection: { enabled: true },
-      consent_collection: { terms_of_service: "required" },
       custom_text: {
         shipping_address: { message: "Enter the New Zealand delivery address for this order." },
         submit: { message: "Your payment is processed securely by Stripe." },
