@@ -9,10 +9,6 @@ const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "https://cvt-bearings.verc
   "",
 );
 
-function safeNextPath(value: string | null) {
-  return value?.startsWith("/") && !value.startsWith("//") ? value : "/account";
-}
-
 export function AuthForm() {
   const query = useSearchParams();
   const [signup, setSignup] = useState(query.get("mode") === "signup");
@@ -28,7 +24,10 @@ export function AuthForm() {
           email,
           password,
           options: {
-            data: { full_name: String(formData.get("name") || "") },
+            data: {
+              full_name: String(formData.get("name") || "").trim(),
+              first_name: String(formData.get("name") || "").trim().split(/\s+/)[0] || "",
+            },
             emailRedirectTo: `${SITE_URL}/account`,
           },
         })
@@ -44,7 +43,7 @@ export function AuthForm() {
       window.dispatchEvent(
         new CustomEvent("cvt-authenticated", { detail: { userId: result.data.user.id } }),
       );
-      router.replace(safeNextPath(query.get("next")));
+      router.replace("/");
       router.refresh();
     }
   }

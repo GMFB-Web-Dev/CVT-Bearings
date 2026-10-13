@@ -3,10 +3,12 @@
 import Link from "next/link";
 import Image from "next/image";
 import { ChevronDown, Heart, Menu, ShoppingCart, UserRound, X } from "lucide-react";
-import { Suspense, useState, type ReactNode } from "react";
+import { Suspense, useEffect, useState, type ReactNode } from "react";
 import { usePathname } from "next/navigation";
 import { useCart } from "@/components/CartProvider";
 import { SmartSearch } from "@/components/SmartSearch";
+import { createClient } from "@/lib/supabase/client";
+import type { User } from "@supabase/supabase-js";
 
 type ActiveLinkProps = {
   href: string;
@@ -32,10 +34,40 @@ function ActiveLink(props: ActiveLinkProps) {
 
 const offerItems = Array(5).fill("Get 10% Off Your First Order");
 
+function getFirstName(user: User | null) {
+  if (!user) return "";
+
+  const metadata = user.user_metadata;
+  const suppliedName = [metadata.first_name, metadata.given_name, metadata.full_name, metadata.name]
+    .find((value): value is string => typeof value === "string" && value.trim().length > 0);
+
+  return suppliedName?.trim().split(/\s+/)[0] || user.email?.split("@")[0] || "Account";
+}
+
 export function Header() {
   const [menu, setMenu] = useState(false);
   const [offerVisible, setOfferVisible] = useState(true);
+  const [firstName, setFirstName] = useState("");
   const { count, setOpen } = useCart();
+
+  useEffect(() => {
+    const supabase = createClient();
+    let active = true;
+
+    void supabase.auth.getUser().then(({ data }) => {
+      if (active) setFirstName(getFirstName(data.user));
+    });
+
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (active) setFirstName(getFirstName(session?.user ?? null));
+    });
+
+    return () => {
+      active = false;
+      authListener.subscription.unsubscribe();
+    };
+  }, []);
+
   return <>
     <div className={`offer-bar${offerVisible ? "" : " dismissed"}`} aria-label="First order discount" aria-hidden={!offerVisible}>
       <div className="offer-track">
@@ -46,7 +78,7 @@ export function Header() {
     <div className="sticky-navigation">
       <div className="network-bar">
         <div className="network-links"><a href="https://cvtnz.co.nz">CVT<span>NZ</span></a><Link className="active" href="/">CVT<small>Bearings</small></Link><a href="https://cvt-parts.co.nz">CVT<small>Parts</small></a></div>
-        <div className="utility-links"><ActiveLink href="/about">About</ActiveLink><ActiveLink href="/contact">Contact</ActiveLink><ActiveLink href="/login-sign-up" match={["/login", "/account"]}>Sign in / Sign up</ActiveLink><Link href="/account#wishlist" className="utility-icon" aria-label="Wishlist"><Heart size={17}/></Link><button onClick={() => setOpen(true)} aria-label="Open cart"><ShoppingCart size={18}/>{count > 0 && <b>{count}</b>}</button></div>
+        <div className="utility-links"><ActiveLink href="/about">About</ActiveLink><ActiveLink href="/contact">Contact</ActiveLink><ActiveLink href={firstName ? "/account" : "/login-sign-up"} match={["/login", "/account"]}>{firstName ? `Hi, ${firstName}` : "Sign in / Sign up"}</ActiveLink><Link href="/account#wishlist" className="utility-icon" aria-label="Wishlist"><Heart size={17}/></Link><button onClick={() => setOpen(true)} aria-label="Open cart"><ShoppingCart size={18}/>{count > 0 && <b>{count}</b>}</button></div>
       </div>
       <header className="main-header">
         <Link href="/" className="brand"><Image src="/assets/logo.png" width={235} height={64} alt="CVT Bearings" priority unoptimized /></Link>
@@ -56,7 +88,7 @@ export function Header() {
           <ActiveLink href="/help" match={["/shipping-returns", "/orders-payments"]} onClick={() => setMenu(false)}>General information</ActiveLink>
         </nav>
         <SmartSearch/>
-        <Link href="/login-sign-up" className="mobile-account" aria-label="Account"><UserRound/></Link>
+        <Link href={firstName ? "/account" : "/login-sign-up"} className="mobile-account" aria-label={firstName ? `${firstName}'s account` : "Sign in or create an account"}><UserRound/></Link>
         <button className="menu-button" onClick={() => setMenu(!menu)} aria-label="Menu">{menu ? <X/> : <Menu/>}</button>
       </header>
     </div>
