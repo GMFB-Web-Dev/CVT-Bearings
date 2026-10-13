@@ -16,6 +16,10 @@ The app expects these local variables:
 ```dotenv
 NEXT_PUBLIC_SUPABASE_URL=...
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=...
+SUPABASE_SERVICE_ROLE_KEY=... # server-only; required for order/webhook writes
+NEXT_PUBLIC_PAYLOAD_URL=https://payload.gmfb.co.nz
+PAYLOAD_TENANT_SLUG=cvt-bearings
+REVALIDATION_SECRET=... # server-only; must match the Payload webhook secret
 ```
 
 Product-review photos and videos are uploaded directly to a private Cloudflare
@@ -25,14 +29,17 @@ policy to allow `PUT` requests from the storefront origin with the
 `Content-Type` header. `R2_PUBLIC_BASE_URL` should point to the public/custom
 domain used to serve approved review media.
 
-## Data and database
+## Content, catalogue, and database
 
-- `data/products.json` is the deployment catalogue supplied by CVT Bearings.
-- Product media under `public/products/` comes from the developer package; design media under `public/assets/` comes from the Figma export.
+- Published page copy, navigation, shared component copy, and site media come from Payload at `payload.gmfb.co.nz`, tenant ID `6`. Source strings and local assets remain fallbacks for missing CMS fields.
+- The live product catalogue comes from `public.products` in the CVT Supabase project, always scoped with `site_key = 'cvt-bearings'` and `visible = true`. The checked-in JSON catalogue is no longer used at runtime.
+- Product and site media may be served from `media.gmfb.co.nz`; legacy files under `public/products/` and `public/assets/` remain supported during migration.
 - Screenshot attachments are not application assets and must not be copied into or referenced by the site.
 - The Supabase schema is in `supabase/migrations/`.
 - All shared-project data is explicitly scoped with `site_key = 'cvt-bearings'` so future GMFB storefronts remain isolated.
 - Row Level Security protects profiles, carts, orders, reviews, and enquiries. Quote-only products are rejected by the cart policy.
+
+Public CMS and catalogue reads use a 60-second cache lifetime with tenant-scoped Next.js cache tags. Payload posts authenticated changes to `/api/revalidate/payload`; the route invalidates tenant, page/shared/product tags and the affected paths. Never expose `REVALIDATION_SECRET` to the browser or commit it.
 
 ## Verification
 
@@ -41,4 +48,8 @@ npm run lint
 npm run build
 ```
 
-Stripe checkout is intentionally not connected yet. Cart totals and order data are ready for the payment integration phase, while checkout remains disabled.
+## Stripe Checkout
+
+Stripe-hosted Checkout is implemented for signed-in customers purchasing fixed-price products. Catalogue prices are treated as GST-inclusive: Checkout itemises the included 15% NZ GST without adding it again. The signed webhook stores Stripe's final `amount_total` as the authoritative order total, and the purchased cart is cleared only after the returning Checkout Session is confirmed as paid for the signed-in customer.
+
+Stripe account, webhook, Vercel environment-variable and sandbox testing steps are documented in [`docs/stripe-checkout.md`](docs/stripe-checkout.md). Keep test and live credentials separate, and complete the documented sandbox checkout before enabling live payments.

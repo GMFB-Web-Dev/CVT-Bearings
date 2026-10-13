@@ -1,6 +1,6 @@
 # Stripe Checkout setup
 
-The storefront uses Stripe-hosted Checkout. Product IDs and quantities come from the browser, but prices, eligibility and currency are always re-read from the server catalogue before a Checkout Session is created. All displayed catalogue prices include GST.
+The storefront uses Stripe-hosted Checkout. Product IDs and quantities come from the browser, but prices, eligibility and currency are always re-read from the server catalogue before a Checkout Session is created. All displayed fixed-price catalogue amounts are treated as GST-inclusive unless CVT Bearings supplies definitive product-level evidence otherwise.
 
 ## Stripe account setup
 
@@ -19,7 +19,7 @@ Use the CVT Bearings Stripe account, starting in test mode.
 
 ## Vercel environment variables
 
-Add these as sensitive variables to Preview and Production, using test-mode values until the test checkout has been verified:
+Add these to Preview and Production, using test-mode values until the test checkout has been verified. Store the Stripe secret, webhook secret, and Supabase service-role key as Vercel **Secret** variables; the tax/shipping IDs and public site URL can be **Config** variables.
 
 ```text
 STRIPE_SECRET_KEY=rk_test_...
@@ -41,6 +41,13 @@ stripe listen --forward-to localhost:3001/api/stripe/webhook
 ```
 
 Then complete a test-mode Checkout Session. Confirm that the order moves from `pending` to `paid` in Supabase only after the signed webhook arrives.
+
+Also confirm that:
+
+- the saved `total_nzd` exactly matches the Checkout Session `amount_total`;
+- `tax_nzd` is the included GST portion and is not added to `total_nzd` again;
+- the purchased browser and Supabase carts are cleared/converted after the paid return;
+- the configured delivery amount and its GST treatment match the approved CVT Bearings charge.
 
 ## Going live
 

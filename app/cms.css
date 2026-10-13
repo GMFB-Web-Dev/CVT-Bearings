@@ -1,0 +1,11 @@
+.hero,
+.popular-types,
+.article-hero { background-image: var(--cms-hero, url('/assets/hero.jpg')); }
+.find-panel { background-image: var(--cms-facility, url('/assets/facility.png')); }
+.blog-banner,
+.inner-hero,
+.why-grid,
+.orders-hero { background-image: var(--cms-transmission, url('/assets/transmission.jpg')); }
+.about-hero { background-image: var(--cms-about-hero, url('/assets/about-hero.jpg')); }
+.contact-hero { background-image: var(--cms-contact-hero, url('/assets/contact-hero.jpg')); }
+.shipping-hero { background-image: var(--cms-shipping-hero, url('/assets/shipping-hero.jpg')); }

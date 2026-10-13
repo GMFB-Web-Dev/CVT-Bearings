@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Catalogue } from "@/components/Catalogue";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { sectionProducts } from "@/lib/catalog";
+import { getProducts } from "@/lib/catalog-data";
 
 const titles: Record<string, string> = { "main-bearing-kits": "Main Bearing Kits", "pulley-bearings": "Pulley Bearings", "primary-pulley-bearings": "Primary Pulley Bearings" };
 export const instant = false;
@@ -11,6 +12,7 @@ export async function generateMetadata({ params }: { params: Promise<{ section: 
 
 export default async function BearingSection({ params, searchParams }: { params: Promise<{ section: string }>; searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const { section } = await params; const query = await searchParams; if (!titles[section]) notFound();
-  const products = sectionProducts(section);
-  return <div className="catalogue-shell"><div className="page-width"><Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Bearings", href: "/bearings" }, { label: titles[section] }]}/><div className="catalogue-title"><h1>{titles[section]}</h1><p>Search by tag, vehicle, make and bearing type</p></div><Catalogue initialProducts={products.length ? products : sectionProducts()} initialQuery={typeof query.q === "string" ? query.q : ""}/></div></div>;
+  const allProducts = await getProducts();
+  const products = sectionProducts(allProducts, section);
+  return <div className="catalogue-shell"><div className="page-width"><Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Bearings", href: "/bearings" }, { label: titles[section] }]}/><div className="catalogue-title"><h1>{titles[section]}</h1><p>Search by tag, vehicle, make and bearing type</p></div><Catalogue initialProducts={products.length ? products : allProducts} initialQuery={typeof query.q === "string" ? query.q : ""}/></div></div>;
 }

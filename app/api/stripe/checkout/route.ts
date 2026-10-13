@@ -1,5 +1,6 @@
 import type Stripe from "stripe";
-import { products, SITE_KEY } from "@/lib/catalog";
+import { productCanCheckout, SITE_KEY } from "@/lib/catalog";
+import { getProductsUncached } from "@/lib/catalog-data";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getSiteUrl, getStripe, STRIPE_INTEGRATION_IDENTIFIER } from "@/lib/stripe";
@@ -42,12 +43,19 @@ export async function POST(request: Request) {
     return jsonError("Sign in before continuing to secure checkout.", 401, "AUTH_REQUIRED");
   }
 
+  let products;
+  try {
+    products = await getProductsUncached();
+  } catch (error) {
+    console.error("Live product validation failed", error);
+    return jsonError("We could not verify current prices and stock. Please try again.", 503);
+  }
   const catalogueById = new Map(products.map((product) => [product.id, product]));
   const lines = incoming.map((line) => ({ ...line, product: catalogueById.get(line.productId) }));
 
   if (lines.some((line) => !line.product)) return jsonError("A product in your cart is no longer available.", 409);
-  if (lines.some(({ product }) => product!.commerce.mode !== "fixed_price" || !product!.commerce.cart_eligible || product!.price.amount == null)) {
-    return jsonError("A quote-only product cannot be paid for online. Remove it or request a quote.", 409);
+  if (lines.some(({ product }) => !productCanCheckout(product!))) {
+    return jsonError("A product is quote-only, out of stock, or no longer available. Remove it or request a quote.", 409);
   }
   const gstTaxRateId = process.env.STRIPE_NZ_GST_TAX_RATE_ID;
   if (!gstTaxRateId) {
@@ -74,6 +82,7 @@ export async function POST(request: Request) {
     user_id: user.id,
     status: "draft",
     subtotal_nzd: subtotal,
+    total_nzd: subtotal,
   }).select("id").single();
 
   if (orderError || !order) {

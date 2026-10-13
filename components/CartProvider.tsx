@@ -4,13 +4,22 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import { createClient } from "@/lib/supabase/client";
 import { SITE_KEY } from "@/lib/catalog";
 
+function savedProductImage(path?: string) {
+  if (!path) return "";
+  if (/^https:\/\//i.test(path)) return path;
+  if (/^http:\/\//i.test(path)) return path.replace(/^http:\/\//i, "https://");
+  if (path.startsWith("/")) return path;
+  return `/${path.replace(/^photos\/products\//, "products/")}`;
+}
+
 export type CartLine = { productId: string; slug: string; title: string; price: number; image: string; quantity: number };
-type CartValue = { lines: CartLine[]; count: number; total: number; add: (line: Omit<CartLine, "quantity">, quantity?: number) => void; update: (id: string, quantity: number) => void; remove: (id: string) => void; clear: () => void; open: boolean; setOpen: (open: boolean) => void };
+type CartValue = { lines: CartLine[]; count: number; total: number; hydrated: boolean; add: (line: Omit<CartLine, "quantity">, quantity?: number) => void; update: (id: string, quantity: number) => void; remove: (id: string) => void; clear: () => void; open: boolean; setOpen: (open: boolean) => void };
 const CartContext = createContext<CartValue | null>(null);
 
 async function saveCart(lines: CartLine[], userId: string) {
   const supabase = createClient();
   let { data: cart } = await supabase.from("carts").select("id").eq("site_key", SITE_KEY).eq("user_id", userId).eq("status", "active").maybeSingle();
+  if (!cart && !lines.length) return;
   if (!cart) {
     const created = await supabase.from("carts").insert({ site_key: SITE_KEY, user_id: userId }).select("id").single();
     cart = created.data;
@@ -28,7 +37,7 @@ async function loadCart(userId: string): Promise<CartLine[]> {
   return (rows || []).map((row) => {
     const product = Array.isArray(row.products) ? row.products[0] : row.products;
     const images = (product?.images || []) as { path?: string }[];
-    return { productId: row.product_id, slug: product?.slug || "", title: product?.title || "CVT bearing", price: Number(row.unit_price_nzd), image: images[0]?.path ? `/products/${images[0].path}` : "", quantity: row.quantity };
+    return { productId: row.product_id, slug: product?.slug || "", title: product?.title || "CVT bearing", price: Number(row.unit_price_nzd), image: savedProductImage(images[0]?.path), quantity: row.quantity };
   });
 }
 
@@ -59,8 +68,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       if (cancelled) return;
       setLines(merged);
       localStorage.setItem("cvt-bearings-cart", JSON.stringify(merged));
-      setHydrated(true);
       if (user && merged.length) await saveCart(merged, user.id);
+      if (!cancelled) setHydrated(true);
     }
     void hydrate();
     return () => { cancelled = true; };
@@ -95,16 +104,19 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setLines((current) => { const next = change(current); void sync(next); return next; });
   }, [sync]);
 
+  const clear = useCallback(() => commit(() => []), [commit]);
+
   const value = useMemo<CartValue>(() => ({
     lines,
     count: lines.reduce((sum, line) => sum + line.quantity, 0),
     total: lines.reduce((sum, line) => sum + line.quantity * line.price, 0),
+    hydrated,
     add(line, quantity = 1) { commit((current) => current.some((item) => item.productId === line.productId) ? current.map((item) => item.productId === line.productId ? { ...item, quantity: item.quantity + quantity } : item) : [...current, { ...line, quantity }]); setOpen(true); },
     update(id, quantity) { commit((current) => current.map((line) => line.productId === id ? { ...line, quantity: Math.max(1, quantity) } : line)); },
     remove(id) { commit((current) => current.filter((line) => line.productId !== id)); },
-    clear() { commit(() => []); },
+    clear,
     open, setOpen,
-  }), [lines, open, commit]);
+  }), [lines, hydrated, open, commit, clear]);
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }
 

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { PopularTypesTabs } from "@/components/PopularTypesTabs";
-import { productSection, products, type ProductSection } from "@/lib/catalog";
+import { productSection, type Product, type ProductSection } from "@/lib/catalog";
 
 const popularTypes: Array<{ id: ProductSection; label: string }> = [
   { id: "main-bearing-kits", label: "Main bearing kits" },
@@ -11,9 +11,11 @@ const popularTypes: Array<{ id: ProductSection; label: string }> = [
 export function PopularTypesSection({
   excludeProductId = "",
   activeSection = "main-bearing-kits",
+  products,
 }: {
   excludeProductId?: string;
   activeSection?: ProductSection;
+  products: Product[];
 }) {
   const categories = popularTypes.map((type) => ({
     ...type,

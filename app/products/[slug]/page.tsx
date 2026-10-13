@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { getProduct, money, productImage, products, productSection } from "@/lib/catalog";
+import { money, productImage, productSection } from "@/lib/catalog";
+import { getProduct, getProducts } from "@/lib/catalog-data";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { PopularTypesSection } from "@/components/PopularTypesSection";
 import { ProductPurchase } from "@/components/ProductPurchase";
@@ -12,8 +13,8 @@ import { ProductDetailTabs } from "@/components/ProductDetailTabs";
 
 export const instant = false;
 
-export function generateStaticParams() {
-  return products.map((product) => ({ slug: product.slug }));
+export async function generateStaticParams() {
+  return (await getProducts()).map((product) => ({ slug: product.slug }));
 }
 
 export async function generateMetadata({
@@ -21,7 +22,7 @@ export async function generateMetadata({
 }: {
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
-  const product = getProduct((await params).slug);
+  const product = await getProduct((await params).slug);
   return {
     title: product?.title || "Product",
     description: product?.description,
@@ -33,7 +34,7 @@ export default async function ProductPage({
 }: {
   params: Promise<{ slug: string }>;
 }) {
-  const product = getProduct((await params).slug);
+  const product = await getProduct((await params).slug);
   if (!product) notFound();
 
   const galleryImages = product.images.flatMap((image, index) => {
@@ -79,7 +80,7 @@ export default async function ProductPage({
         </div>
         <div id="product-reviews"><Reviews productId={product.id}/></div>
       </div>
-      <PopularTypesSection excludeProductId={product.id} activeSection={section}/>
+      <PopularTypesSection products={await getProducts()} excludeProductId={product.id} activeSection={section}/>
       <PromoCards/>
     </div>
   );

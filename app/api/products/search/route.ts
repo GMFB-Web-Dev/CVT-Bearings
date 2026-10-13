@@ -1,4 +1,5 @@
-import { money, productImage, products, type Product } from "@/lib/catalog";
+import { money, productImage, type Product } from "@/lib/catalog";
+import { getProducts } from "@/lib/catalog-data";
 import {
   normaliseSearch,
   parseDimension,
@@ -29,6 +30,13 @@ function detailsFor(product: Product, vehicle: string, type: string) {
 }
 
 export async function GET(request: Request) {
+  let products: Product[];
+  try {
+    products = await getProducts();
+  } catch (error) {
+    console.error("Live product search read failed", error);
+    return Response.json({ error: "Product catalogue is temporarily unavailable." }, { status: 503 });
+  }
   const params = new URL(request.url).searchParams;
   const query = params.get("q")?.trim() ?? "";
   const inferredDimensions = parseLooseDimensionQuery(query);

@@ -10,6 +10,7 @@ function dollars(cents: number | null | undefined) {
 async function markPaid(session: Stripe.Checkout.Session) {
   const orderId = session.metadata?.order_id || session.client_reference_id;
   if (!orderId || session.metadata?.site_key !== SITE_KEY || session.payment_status === "unpaid") return;
+  if (session.amount_total == null) throw new Error("Paid Checkout Session is missing amount_total.");
 
   const admin = createAdminClient();
   const paymentIntentId = typeof session.payment_intent === "string" ? session.payment_intent : session.payment_intent?.id;
@@ -21,6 +22,7 @@ async function markPaid(session: Stripe.Checkout.Session) {
     subtotal_nzd: dollars(session.amount_subtotal),
     shipping_nzd: dollars(session.total_details?.amount_shipping),
     tax_nzd: dollars(session.total_details?.amount_tax),
+    total_nzd: dollars(session.amount_total),
     shipping_address: shippingAddress,
     customer_email: session.customer_details?.email || session.customer_email,
     stripe_payment_intent_id: paymentIntentId || null,
@@ -32,8 +34,9 @@ async function markPaid(session: Stripe.Checkout.Session) {
 
   const userId = session.metadata?.user_id;
   if (userId) {
-    await admin.from("carts").update({ status: "converted", updated_at: new Date().toISOString() })
+    const { error: cartError } = await admin.from("carts").update({ status: "converted", updated_at: new Date().toISOString() })
       .eq("site_key", SITE_KEY).eq("user_id", userId).eq("status", "active");
+    if (cartError) throw cartError;
   }
 }
 
