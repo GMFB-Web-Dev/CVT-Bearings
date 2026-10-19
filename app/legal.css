@@ -83,7 +83,7 @@ h3 { font-size: clamp(21px, 1.7vw, 26px); line-height: 1.2; letter-spacing: -.02
 .article-toc { position: absolute; z-index: 2; top: 525px; left: max(22px, calc((100% - 1340px) / 2)); width: 185px; display: grid; gap: 8px; padding: 16px; border: 1px solid var(--red); background: #fff; font-size: 11px; }
 .article-toc b { margin: -16px -16px 4px; padding: 10px 16px; color: #fff; background: var(--red); text-transform: uppercase; }
 .article-toc a { line-height: 1.35; }
-.article-card h2 { scroll-margin-top: 20px; }
+.article-card h2 { scroll-margin-top: calc(var(--sticky-navigation-height) + var(--scroll-clearance)); }
 .help-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; max-width: 1150px; margin: 42px auto 0; }
 .help-grid a { padding: 28px; background: #f3f3f3; text-align: center; }
 .help-grid svg { color: #111; }
