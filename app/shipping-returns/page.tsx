@@ -2,8 +2,17 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { BlogBanner, ContactSection, ServiceStrip } from "@/components/SharedSections";
 import { entry, getPage, section } from "@/lib/cms";
+import { createPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = { title: "Shipping & Returns" };
+export const metadata: Metadata = createPageMetadata({
+  title: "Shipping & Returns | CVT Bearings NZ",
+  description: "View shipping and returns information for CVT Bearings. Find details on CVT bearing orders, transmission parts supply and support across New Zealand.",
+  path: "/shipping-and-returns",
+  keywords: ["CVT Bearings Shipping", "CVT Bearings Returns", "CVT Bearings NZ"],
+  image: "/assets/shipping-hero.jpg",
+  imageTitle: "CVT Bearings shipping and returns information for New Zealand customers",
+  imageAlt: "Shipping and returns information for CVT Bearings, supplying CVT bearings and transmission parts across New Zealand",
+});
 function Table({ rows }: { rows: string[][] }) { return <table className="info-table"><tbody>{rows.map(([q, a]) => <tr key={q}><th>{q}</th><td>{a}</td></tr>)}</tbody></table>; }
 
 export default async function ShippingPage() {

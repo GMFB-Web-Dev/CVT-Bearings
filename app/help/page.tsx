@@ -4,8 +4,17 @@ import { CircleHelp, MessagesCircle, Store, Truck, UserRound, WalletCards, type 
 import { BrandMarquee, SearchPanel } from "@/components/SharedSections";
 import { getProducts } from "@/lib/catalog-data";
 import { entry, getPage, section } from "@/lib/cms";
+import { createPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = { title: "General Information" };
+export const metadata: Metadata = createPageMetadata({
+  title: "General Info | CVT Bearings NZ",
+  description: "Find contact details and general information for CVT Bearings. Get help with CVT bearings, transmission parts, product enquiries and NZ-wide supply.",
+  path: "/general-info",
+  keywords: ["CVT Bearings Contact", "CVT Bearings NZ", "CVT Transmission Parts NZ"],
+  image: "/assets/transmission.jpg",
+  imageTitle: "CVT Bearings contact and general information for New Zealand customers",
+  imageAlt: "Contact and general information page for CVT Bearings, supplying CVT bearings and transmission parts across New Zealand",
+});
 
 export default async function HelpPage() {
   const [page, products] = await Promise.all([getPage("/help"), getProducts()]);
@@ -20,8 +29,8 @@ export default async function HelpPage() {
     [c("copy-012", "What information should I send if I am unsure which part I need?"), c("copy-013", "Send your transmission code, vehicle details, part numbers, dimensions and photos.")],
   ];
   const cards: Array<[LucideIcon, string, string]> = [
-    [Truck, c("copy-014", "Shipping & Returns"), "/shipping-returns"], [WalletCards, c("copy-015", "Orders & Payments"), "/orders-payments"],
-    [Store, c("copy-016", "Product & Store"), "/bearings"], [CircleHelp, c("copy-017", "About us"), "/about"],
+    [Truck, c("copy-014", "Shipping & Returns"), "/shipping-and-returns"], [WalletCards, c("copy-015", "Orders & Payments"), "/orders-and-payments"],
+    [Store, c("copy-016", "Product & Store"), "/bearings"], [CircleHelp, c("copy-017", "About us"), "/about-us"],
     [MessagesCircle, c("copy-018", "Contact Us"), "/contact"], [UserRound, c("copy-019", "Log in / Sign up"), "/login-sign-up"],
   ];
   return <div className="help-page"><section className="content-section help-content"><h1>{c("copy-020", "How can")} <em>{c("copy-021", "we help?")}</em></h1><div className="help-grid">{cards.map(([Icon, label, href]) => <Link key={label} href={href}><Icon aria-hidden="true"/><h3>{label}</h3></Link>)}</div><div className="faq section"><h2>{c("copy-022", "FAQs")}</h2>{faqs.map(([question, answer]) => <details key={question}><summary>{question}</summary><p>{answer}</p></details>)}</div></section><BrandMarquee/><SearchPanel products={products}/></div>;

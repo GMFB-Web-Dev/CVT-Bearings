@@ -11,6 +11,7 @@ import { CartDrawer } from "@/components/CartDrawer";
 import { CmsProvider } from "@/components/CmsProvider";
 import { GtmPageView } from "@/components/GtmPageView";
 import { assetURL, getNavigation, getSiteSettings } from "@/lib/cms";
+import { siteOrigin } from "@/lib/seo";
 import type { CSSProperties } from "react";
 
 const geistSans = Geist({
@@ -21,6 +22,7 @@ const geistSans = Geist({
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSiteSettings();
   return {
+    metadataBase: new URL(siteOrigin()),
     title: { default: settings?.defaultSEO?.title || "CVT Bearings NZ", template: `%s | ${settings?.businessName || "CVT Bearings NZ"}` },
     description: settings?.defaultSEO?.description || "New Zealand CVT bearing specialists. Search by bearing, transmission, vehicle and dimensions.",
   };

@@ -3,8 +3,17 @@ import Image from "next/image";
 import Link from "next/link";
 import { BlogBanner, ContactSection, PromoCards, ServiceStrip } from "@/components/SharedSections";
 import { assetURL, entry, getPage, section } from "@/lib/cms";
+import { createPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = { title: "About Us" };
+export const metadata: Metadata = createPageMetadata({
+  title: "About CVT Bearings | CVT Bearings & Transmission Parts NZ",
+  description: "Learn about CVT Bearings and our focus on supplying CVT bearings and transmission parts across New Zealand for workshops, mechanics and vehicle repair needs.",
+  path: "/about-us",
+  keywords: ["About CVT Bearings", "CVT Bearings NZ", "CVT Transmission Parts NZ"],
+  image: "/assets/about-hero.jpg",
+  imageTitle: "About CVT Bearings and CVT transmission parts supply in New Zealand",
+  imageAlt: "About CVT Bearings, supplying CVT bearings and transmission parts for workshops and vehicle repairs across New Zealand",
+});
 
 export default async function AboutPage() {
   const page = await getPage("/about");

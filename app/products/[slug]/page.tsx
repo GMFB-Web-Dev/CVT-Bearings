@@ -58,7 +58,7 @@ export default async function ProductPage({
       <div className="page-width">
         <Breadcrumbs
           items={[
-            { label: c("copy-002", "Home"), href: "/" },
+            { label: c("copy-002", "Home"), href: "/home" },
             { label: c("copy-003", "All Products"), href: "/bearings" },
             { label: sectionLabel, href: `/bearings/${section}` },
             { label: product.title },

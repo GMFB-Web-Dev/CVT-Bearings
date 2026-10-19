@@ -1,8 +1,17 @@
 import type { Metadata } from "next";
 import { ContactSection, ServiceStrip } from "@/components/SharedSections";
 import { entry, getPage, section } from "@/lib/cms";
+import { createPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = { title: "Contact Us" };
+export const metadata: Metadata = createPageMetadata({
+  title: "Contact CVT Bearings | CVT Bearings & Transmission Parts NZ",
+  description: "Contact CVT Bearings for CVT bearings and transmission parts across New Zealand. Get help finding the right parts for workshops, mechanics and vehicle repairs.",
+  path: "/contact",
+  keywords: ["Contact CVT Bearings", "CVT Bearings NZ", "CVT Transmission Parts NZ"],
+  image: "/assets/contact-hero.jpg",
+  imageTitle: "Contact CVT Bearings for CVT bearings and transmission parts in New Zealand",
+  imageAlt: "CVT Bearings contact page for CVT bearings and transmission parts supplied across New Zealand",
+});
 export const instant = false;
 
 export default async function ContactPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {

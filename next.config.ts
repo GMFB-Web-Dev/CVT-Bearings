@@ -1,9 +1,15 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
   cacheComponents: true,
   partialPrefetching: true,
+  redirects: async () => [
+    { source: "/", destination: "/home", permanent: true },
+    { source: "/about", destination: "/about-us", permanent: true },
+    { source: "/help", destination: "/general-info", permanent: true },
+    { source: "/shipping-returns", destination: "/shipping-and-returns", permanent: true },
+    { source: "/orders-payments", destination: "/orders-and-payments", permanent: true },
+  ],
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "media.gmfb.co.nz", pathname: "/media/**" },

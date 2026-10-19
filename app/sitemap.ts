@@ -5,7 +5,8 @@ import { getPages, type CmsPage } from "@/lib/cms";
 
 const FALLBACK_ORIGIN = "https://cvt-bearings.vercel.app";
 const PRIVATE_PATHS = new Set(["/account", "/cart", "/checkout/success", "/login", "/login-sign-up"]);
-const CORE_PATHS = ["/", "/about", "/bearings", "/blogs", "/contact", "/help", "/orders-payments", "/shipping-returns", "/privacy", "/terms", "/cookies"];
+const REDIRECT_PATHS = new Set(["/", "/about", "/help", "/orders-payments", "/shipping-returns"]);
+const CORE_PATHS = ["/home", "/about-us", "/bearings", "/blogs", "/contact", "/general-info", "/orders-and-payments", "/shipping-and-returns", "/privacy", "/terms", "/cookies"];
 
 function siteOrigin() {
   const configured = process.env.NEXT_PUBLIC_SITE_URL?.trim();
@@ -22,11 +23,12 @@ function indexablePath(path: string) {
     && !path.startsWith("//")
     && !path.includes("[")
     && !path.includes("]")
-    && !PRIVATE_PATHS.has(path);
+    && !PRIVATE_PATHS.has(path)
+    && !REDIRECT_PATHS.has(path);
 }
 
 function pageSettings(path: string): Pick<MetadataRoute.Sitemap[number], "changeFrequency" | "priority"> {
-  if (path === "/") return { changeFrequency: "weekly", priority: 1 };
+  if (path === "/home") return { changeFrequency: "weekly", priority: 1 };
   if (path === "/bearings" || path.startsWith("/bearings/")) return { changeFrequency: "weekly", priority: 0.9 };
   if (path === "/blogs" || path.startsWith("/blogs/")) return { changeFrequency: "monthly", priority: 0.7 };
   if (["/privacy", "/terms", "/cookies"].includes(path)) return { changeFrequency: "yearly", priority: 0.3 };

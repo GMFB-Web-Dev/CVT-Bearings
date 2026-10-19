@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ProductCard } from "@/components/ProductCard";
 import { BlogBanner, BrandMarquee, ContactSection, PromoCards, SearchPanel, ServiceStrip } from "@/components/SharedSections";
@@ -5,6 +6,17 @@ import { AutoCarousel } from "@/components/AutoCarousel";
 import { PopularTypesSection } from "@/components/PopularTypesSection";
 import { getProducts } from "@/lib/catalog-data";
 import { entry, getPage, section } from "@/lib/cms";
+import { createPageMetadata } from "@/lib/seo";
+
+export const metadata: Metadata = createPageMetadata({
+  title: "CVT Bearings | CVT Bearings & Transmission Parts NZ",
+  description: "CVT Bearings supplies CVT bearings and transmission parts across New Zealand, helping workshops and vehicle owners find the right parts for CVT repair and servicing.",
+  path: "/home",
+  keywords: ["CVT Bearings NZ", "CVT Transmission Parts NZ", "CVT Parts NZ"],
+  image: "/assets/hero.jpg",
+  imageTitle: "CVT Bearings and CVT transmission parts supplied across New Zealand",
+  imageAlt: "CVT bearings and transmission parts supplied by CVT Bearings for workshops and vehicle repairs across New Zealand",
+});
 
 export default async function Home() {
   const [products, page] = await Promise.all([getProducts(), getPage("/")]);

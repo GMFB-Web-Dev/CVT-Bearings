@@ -65,7 +65,7 @@ export function ProductDetailTabs({
           <div><CreditCard aria-hidden="true"/><span><strong>Flexible payment options</strong><small>Stripe shows the payment methods available for your device and location at checkout.</small></span></div>
           <Image src="/assets/payment-logos.png" width={520} height={53} alt="Common payment methods; final availability is shown in Stripe Checkout"/>
           <div><ShieldCheck aria-hidden="true"/><span><strong>Secure Stripe Checkout</strong><small>Prices include GST. Delivery and the final order total are shown before payment.</small></span></div>
-          <Link href="/orders-payments">Read orders and payment information →</Link>
+          <Link href="/orders-and-payments">Read orders and payment information →</Link>
         </section>
       )}
     </div>

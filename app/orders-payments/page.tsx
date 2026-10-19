@@ -2,8 +2,17 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { BlogBanner, ContactSection, ServiceStrip } from "@/components/SharedSections";
 import { entry, getPage, section } from "@/lib/cms";
+import { createPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = { title: "Orders & Payments" };
+export const metadata: Metadata = createPageMetadata({
+  title: "Orders & Payments | CVT Bearings NZ",
+  description: "View order and payment information for CVT Bearings. Find details on buying CVT bearings and transmission parts, payment options and order support in New Zealand.",
+  path: "/orders-and-payments",
+  keywords: ["CVT Bearings Orders", "CVT Bearings Payments", "CVT Bearings NZ"],
+  image: "/assets/transmission.jpg",
+  imageTitle: "CVT Bearings order and payment information for New Zealand customers",
+  imageAlt: "Orders and payments page for CVT Bearings, supplying CVT bearings and transmission parts across New Zealand",
+});
 function Table({ rows }: { rows: string[][] }) { return <table className="info-table"><tbody>{rows.map(([q, a]) => <tr key={q}><th>{q}</th><td>{a}</td></tr>)}</tbody></table>; }
 
 export default async function OrdersPage() {
