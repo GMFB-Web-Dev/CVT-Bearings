@@ -1,6 +1,5 @@
 .hero,
 .popular-types,
-.article-hero { background-image: var(--cms-hero, url('/assets/hero.jpg')); }
 .find-panel { background-image: var(--cms-facility, url('/assets/facility.png')); }
 .blog-banner,
 .inner-hero,

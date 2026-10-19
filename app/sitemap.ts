@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { getBlogImage, getPublishedBlogPosts, isLegacyBlogFallbackEnabled } from "@/lib/blog-posts";
+import { getBlogImage, getPublishedBlogPosts } from "@/lib/blog-posts";
 import { productImage } from "@/lib/catalog";
 import { getProducts } from "@/lib/catalog-data";
 import { getPages, type CmsPage } from "@/lib/cms";
@@ -48,7 +48,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const pages = pagesResult.status === "fulfilled" ? pagesResult.value : [];
   const products = productsResult.status === "fulfilled" ? productsResult.value : [];
   const posts = postsResult.status === "fulfilled" ? postsResult.value : [];
-  const cmsByPath = new Map(pages.filter((page) => indexablePath(page.path) && (!page.path.startsWith("/blogs/") || isLegacyBlogFallbackEnabled(page.slug))).map((page) => [page.path, page] as const));
+  const cmsByPath = new Map(pages.filter((page) => indexablePath(page.path) && !page.path.startsWith("/blogs/")).map((page) => [page.path, page] as const));
   const publicPaths = new Set([...CORE_PATHS, ...cmsByPath.keys()]);
   const entries = new Map<string, MetadataRoute.Sitemap[number]>();
 

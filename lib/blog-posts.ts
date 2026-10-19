@@ -2,7 +2,6 @@ import "server-only";
 
 import type { SerializedEditorState } from "@payloadcms/richtext-lexical/lexical";
 import { cacheLife, cacheTag } from "next/cache";
-import { blogs } from "@/lib/blogs";
 import { TENANT_TAG } from "@/lib/cms";
 
 const PAYLOAD_TENANT_ID = 6;
@@ -68,12 +67,6 @@ export type BlogListingItem = {
   excerpt?: string | null;
   publishedAt?: string | null;
 };
-
-const legacyBlogSlugs = new Set(blogs.map((blog) => blog.slug));
-
-// Add a slug here when its legacy `pages` document has been deliberately
-// migrated. This prevents an unpublished replacement from reviving old copy.
-const migratedLegacyBlogSlugs = new Set<string>([]);
 
 function payloadOrigin() {
   return (process.env.NEXT_PUBLIC_PAYLOAD_URL || "https://payload.gmfb.co.nz").replace(/\/$/, "");
@@ -156,17 +149,4 @@ export function toBlogListingItem(post: BlogPost): BlogListingItem {
     excerpt: post.excerpt,
     publishedAt: post.publishedAt,
   };
-}
-
-export function isLegacyBlogFallbackEnabled(slug: string) {
-  return legacyBlogSlugs.has(slug) && !migratedLegacyBlogSlugs.has(slug);
-}
-
-export function mergeBlogListings(posts: BlogPost[], legacy: BlogListingItem[]) {
-  const published = posts.map(toBlogListingItem);
-  const publishedSlugs = new Set(published.map((post) => post.slug));
-  return [
-    ...published,
-    ...legacy.filter((post) => isLegacyBlogFallbackEnabled(post.slug) && !publishedSlugs.has(post.slug)),
-  ];
 }

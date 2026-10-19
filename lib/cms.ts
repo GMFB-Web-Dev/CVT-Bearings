@@ -1,6 +1,5 @@
 import "server-only";
 import { SITE_KEY } from "@/lib/catalog";
-import { blogs } from "@/lib/blogs";
 
 export const TENANT_TAG = `tenant:${SITE_KEY}`;
 export const PAGES_TAG = `${TENANT_TAG}:pages`;
@@ -38,12 +37,3 @@ export async function getNavigation() { return (await payloadList<Navigation>("n
 export function section(source: { contentSections?: CmsSection[] } | null | undefined, key: string) { return source?.contentSections?.find((item) => item.key === key); }
 export function entry(source: CmsSection | null | undefined, key: string, fallback: string) { return source?.entries?.find((item) => item.key === key)?.text || fallback; }
 export function assetURL(source: { siteAssets?: CmsAsset[] } | null | undefined, key: string, fallback: string) { const asset = source?.siteAssets?.find((item) => item.key === key)?.asset; const path = asset && typeof asset === "object" ? asset.url : null; if (!path) return fallback; return path.startsWith("http") ? path : `${payloadOrigin()}${path.startsWith("/") ? "" : "/"}${path}`; }
-export function blogSummaries(settings: SiteSettings | null) {
-  const content = section(settings, "lib/blogs.ts");
-  return blogs.map((blog, index) => ({
-    ...blog,
-    title: entry(content, `copy-${String(index * 2 + 1).padStart(3, "0")}`, blog.title),
-    tag: entry(content, `copy-${String(index * 2 + 2).padStart(3, "0")}`, blog.tag),
-    image: assetURL(settings, blog.image.replace(/^\//, ""), blog.image),
-  }));
-}

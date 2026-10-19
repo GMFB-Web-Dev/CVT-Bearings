@@ -32,7 +32,7 @@ domain used to serve approved review media.
 
 ## Content, catalogue, and database
 
-- Published page copy, navigation, shared component copy, blog posts, and site media come from Payload at `payload.gmfb.co.nz`, tenant ID `6`. Source strings and local assets remain fallbacks for missing CMS fields.
+- Published page copy, navigation, shared component copy, and site media come from Payload at `payload.gmfb.co.nz`, tenant ID `6`; source strings and local assets remain fallbacks for those site fields. Blog listings and blog detail routes come exclusively from published tenant-6 `blog-posts` documents.
 - The live product catalogue comes from `public.products` in the CVT Supabase project, always scoped with `site_key = 'cvt-bearings'` and `visible = true`. The checked-in JSON catalogue is no longer used at runtime.
 - Product and site media may be served from `media.gmfb.co.nz`; legacy files under `public/products/` and `public/assets/` remain supported during migration.
 - Screenshot attachments are not application assets and must not be copied into or referenced by the site.
