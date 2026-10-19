@@ -1,9 +1,10 @@
 import type { MetadataRoute } from "next";
+import { getBlogImage, getPublishedBlogPosts, isLegacyBlogFallbackEnabled } from "@/lib/blog-posts";
 import { productImage } from "@/lib/catalog";
 import { getProducts } from "@/lib/catalog-data";
 import { getPages, type CmsPage } from "@/lib/cms";
 
-const FALLBACK_ORIGIN = "https://cvt-bearings.vercel.app";
+const FALLBACK_ORIGIN = "https://www.cvtbearings.co.nz";
 const PRIVATE_PATHS = new Set(["/account", "/cart", "/checkout/success", "/login", "/login-sign-up"]);
 const REDIRECT_PATHS = new Set(["/", "/about", "/help", "/orders-payments", "/shipping-returns"]);
 const CORE_PATHS = ["/home", "/about-us", "/bearings", "/blogs", "/contact", "/general-info", "/orders-and-payments", "/shipping-and-returns", "/privacy", "/terms", "/cookies"];
@@ -43,10 +44,11 @@ function validDate(value?: string | null) {
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const origin = siteOrigin();
-  const [pagesResult, productsResult] = await Promise.allSettled([getPages(), getProducts()]);
+  const [pagesResult, productsResult, postsResult] = await Promise.allSettled([getPages(), getProducts(), getPublishedBlogPosts()]);
   const pages = pagesResult.status === "fulfilled" ? pagesResult.value : [];
   const products = productsResult.status === "fulfilled" ? productsResult.value : [];
-  const cmsByPath = new Map(pages.filter((page) => indexablePath(page.path)).map((page) => [page.path, page] as const));
+  const posts = postsResult.status === "fulfilled" ? postsResult.value : [];
+  const cmsByPath = new Map(pages.filter((page) => indexablePath(page.path) && (!page.path.startsWith("/blogs/") || isLegacyBlogFallbackEnabled(page.slug))).map((page) => [page.path, page] as const));
   const publicPaths = new Set([...CORE_PATHS, ...cmsByPath.keys()]);
   const entries = new Map<string, MetadataRoute.Sitemap[number]>();
 
@@ -69,6 +71,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: validDate(product.updated_at),
       changeFrequency: "weekly",
       priority: 0.8,
+      images: image ? [image.startsWith("http") ? image : `${origin}${image}`] : undefined,
+    });
+  }
+
+  for (const post of posts) {
+    if (!/^[a-z0-9][a-z0-9-]{0,127}$/.test(post.slug)) continue;
+    const path = `/blogs/${post.slug}`;
+    const image = getBlogImage(post)?.url;
+    entries.set(path, {
+      url: `${origin}${path}`,
+      lastModified: validDate(post.updatedAt || post.publishedAt),
+      changeFrequency: "monthly",
+      priority: 0.7,
       images: image ? [image.startsWith("http") ? image : `${origin}${image}`] : undefined,
     });
   }

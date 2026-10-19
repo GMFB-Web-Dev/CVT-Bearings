@@ -19,7 +19,8 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=...
 NEXT_PUBLIC_GTM_ID=GTM-XXXXXXX # public Google Tag Manager web-container ID
 NEXT_PUBLIC_PAYLOAD_URL=https://payload.gmfb.co.nz
 PAYLOAD_TENANT_SLUG=cvt-bearings
-REVALIDATION_SECRET=... # server-only; Payload webhook and scoped order-RPC credential
+PAYLOAD_REVALIDATION_SECRET=... # server-only; Payload webhook credential
+REVALIDATION_SECRET=... # server-only; scoped order-RPC credential
 ```
 
 Product-review photos and videos are uploaded directly to a private Cloudflare
@@ -31,7 +32,7 @@ domain used to serve approved review media.
 
 ## Content, catalogue, and database
 
-- Published page copy, navigation, shared component copy, and site media come from Payload at `payload.gmfb.co.nz`, tenant ID `6`. Source strings and local assets remain fallbacks for missing CMS fields.
+- Published page copy, navigation, shared component copy, blog posts, and site media come from Payload at `payload.gmfb.co.nz`, tenant ID `6`. Source strings and local assets remain fallbacks for missing CMS fields.
 - The live product catalogue comes from `public.products` in the CVT Supabase project, always scoped with `site_key = 'cvt-bearings'` and `visible = true`. The checked-in JSON catalogue is no longer used at runtime.
 - Product and site media may be served from `media.gmfb.co.nz`; legacy files under `public/products/` and `public/assets/` remain supported during migration.
 - Screenshot attachments are not application assets and must not be copied into or referenced by the site.
@@ -39,7 +40,7 @@ domain used to serve approved review media.
 - All shared-project data is explicitly scoped with `site_key = 'cvt-bearings'` so future GMFB storefronts remain isolated.
 - Row Level Security protects profiles, carts, orders, reviews, and enquiries. Quote-only products are rejected by the cart policy.
 
-Public CMS and catalogue reads use a 60-second cache lifetime with tenant-scoped Next.js cache tags. Payload posts authenticated changes to `/api/revalidate/payload`; the route invalidates tenant, page/shared/product tags and the affected paths. Never expose `REVALIDATION_SECRET` to the browser or commit it.
+Public CMS and catalogue reads use tenant-scoped Next.js cache tags. Payload posts authenticated changes to `/api/revalidate/payload`; the route invalidates tenant, page/shared/blog/product tags and the affected paths. Never expose `PAYLOAD_REVALIDATION_SECRET` or `REVALIDATION_SECRET` to the browser or commit them.
 
 ## Verification
 
@@ -63,10 +64,11 @@ History Change page-view trigger, because that would double count navigation.
 
 ## Search indexing
 
-Next.js generates `/sitemap.xml` from published Payload pages and the visible
-live Supabase catalogue. Product entries include their current update timestamp
-and primary image where available. `/robots.txt` points crawlers to the sitemap
-and excludes account, authentication, cart, checkout, and API routes.
+Next.js generates `/sitemap.xml` from published Payload pages and blog posts,
+plus the visible live Supabase catalogue. Product and blog entries include their
+current update timestamp and primary image where available. `/robots.txt` points
+crawlers to the sitemap and excludes account, authentication, cart, checkout,
+and API routes.
 
 ## Stripe Checkout
 
