@@ -147,14 +147,16 @@ function LegacyBlogPost({ slug, page, settings }: { slug: string; page: CmsPage;
     <div className="article-shell">
       <LegacyJsonLd slug={slug} page={page} title={blog.title} image={blog.image}/>
       <div className="article-hero"/>
-      <nav className="article-toc" aria-label={c("copy-001", "Table of contents")}><b>{c("copy-002", "Table of contents")}</b>{toc.map((item) => <a href={item.href} key={item.href}>{item.label}</a>)}</nav>
-      <article className="article-card">
-        <small>{c("copy-017", "Written by Buying Guide")}</small>
-        <h1>{blog.title}</h1>
-        <p style={{ textAlign: "center", color: "#697184" }}>{c("copy-018", "October 8, 2026 · 7 min read")}</p>
-        {article.map(([id, heading, paragraphs]) => <section key={id}><h2 id={id}>{heading}</h2>{paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}</section>)}
-        <div style={{ textAlign: "center", marginTop: 40 }}><Link className="button" href={c("copy-034", "/contact")}>{c("copy-035", "Ask our team")}</Link></div>
-      </article>
+      <div className="article-content-layout">
+        <nav className="article-toc" aria-label={c("copy-001", "Table of contents")}><b>{c("copy-002", "Table of contents")}</b>{toc.map((item) => <a href={item.href} key={item.href}>{item.label}</a>)}</nav>
+        <article className="article-card">
+          <small>{c("copy-017", "Written by Buying Guide")}</small>
+          <h1>{blog.title}</h1>
+          <p style={{ textAlign: "center", color: "#697184" }}>{c("copy-018", "October 8, 2026 · 7 min read")}</p>
+          {article.map(([id, heading, paragraphs]) => <section key={id}><h2 id={id}>{heading}</h2>{paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}</section>)}
+          <div style={{ textAlign: "center", marginTop: 40 }}><Link className="button" href={c("copy-034", "/contact")}>{c("copy-035", "Ask our team")}</Link></div>
+        </article>
+      </div>
       <section className="content-section">
         <h2 style={{ textAlign: "center" }}>{c("copy-036", "View other")} <em>{c("copy-037", "blogs")}</em></h2>
         <div className="blogs-grid">{summaries.filter((item) => item.slug !== slug && isLegacyBlogFallbackEnabled(item.slug)).slice(0, 3).map((item) => <Link className="blog-card" key={item.slug} href={`/blogs/${item.slug}`}><Image src={item.image} width={500} height={500} alt={item.title}/><h3>{item.title}</h3></Link>)}</div>
