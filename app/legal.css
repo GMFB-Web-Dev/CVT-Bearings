@@ -293,8 +293,8 @@ h3 { font-size: clamp(21px, 1.7vw, 26px); line-height: 1.2; letter-spacing: -.02
 .review-list article { min-height: 270px; padding: 48px 20px; }
 .review-list .stars { font-size: 27px; }
 .review-list h4 { font-size: 20px; }
-.review-recommend { color: #111; font-weight: 700; }
-.review-recommend::first-letter { color: var(--red); }
+.review-recommend { display: flex; align-items: center; gap: 10px; color: #111; font-weight: 700; }
+.review-recommend svg { width: 20px; height: 20px; flex: none; color: var(--red); stroke-width: 2; }
 .review-media-links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px; }
 .review-media-links a { padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; color: var(--red); }
 .empty-reviews { min-height: 210px; display: grid; place-items: center; color: var(--muted); text-align: center; }
@@ -318,6 +318,15 @@ h3 { font-size: clamp(21px, 1.7vw, 26px); line-height: 1.2; letter-spacing: -.02
 .review-modal textarea { width: 100%; padding: 12px; border: 1px solid #d7dce4; border-radius: 5px; font-weight: 400; text-transform: none; }
 .review-modal textarea { min-height: 120px; resize: vertical; }
 .review-modal .full { grid-column: 1 / -1; }
+.review-modal form .review-recommend-field { min-height: 64px; padding: 13px 15px; display: flex; align-items: center; gap: 12px; border: 1px solid #d7dce4; border-radius: 8px; text-transform: none; cursor: pointer; }
+.review-recommend-field > input { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; opacity: 0; pointer-events: none; }
+.review-recommend-check { width: 24px; height: 24px; display: grid; flex: none; place-items: center; border: 2px solid var(--red); border-radius: 50%; color: transparent; transition: background-color .18s ease, color .18s ease, box-shadow .18s ease; }
+.review-recommend-check svg { width: 15px; height: 15px; stroke-width: 3; }
+.review-recommend-field > input:checked + .review-recommend-check { background: var(--red); color: #fff; }
+.review-recommend-field > input:focus-visible + .review-recommend-check { box-shadow: 0 0 0 4px color-mix(in srgb, var(--red) 20%, transparent); }
+.review-recommend-field > span:last-child { display: grid; gap: 3px; }
+.review-recommend-field b { color: #172033; font-size: 14px; line-height: 1.35; }
+.review-recommend-field small { color: var(--muted); font-size: 12px; font-weight: 400; line-height: 1.35; }
 .review-upload { position: relative; min-height: 92px; padding: 17px; grid-template-columns: auto 1fr; align-items: center; border: 1px dashed var(--red); border-radius: 8px; color: var(--red); cursor: pointer; }
 .review-upload span { display: grid; gap: 4px; }
 .review-upload small { color: var(--muted); font-weight: 400; text-transform: none; }
@@ -394,7 +403,7 @@ input[type="radio"]:focus-visible {
 :where(input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="hidden"]), select, textarea):focus-visible {
   border-color: var(--red-dark);
   outline: 0;
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--red) 14%, transparent);
+  box-shadow: inset 0 0 0 1px var(--red-dark);
 }
 
 :where(input, select, textarea)::placeholder {
@@ -539,7 +548,8 @@ select { cursor: pointer; }
 .quantity-options {
   position: absolute;
   z-index: 30;
-  bottom: calc(100% + 8px);
+  top: calc(100% + 8px);
+  bottom: auto;
   left: 0;
   width: 112px;
   overflow: hidden;
@@ -1084,10 +1094,6 @@ select { cursor: pointer; }
 .payment-options-panel img { width: min(390px, 100%); height: auto; object-fit: contain; object-position: left center; }
 .product-detail .reviews-section { padding-top: 46px; border-top: 0; }
 
-.popular-types-catalogue-link { margin-top: 34px; text-align: center; }
-.popular-types-catalogue-link .catalogue-button { min-width: 210px; border: 1px solid #050505; background: #050505; }
-.popular-types-catalogue-link .catalogue-button:hover,
-.popular-types-catalogue-link .catalogue-button:focus-visible { border-color: var(--red); background: var(--red-dark); text-decoration-color: transparent; }
 
 @media (max-width: 1000px) {
   .product-main { grid-template-columns: minmax(0, 1fr) minmax(330px, .92fr); gap: 30px; }

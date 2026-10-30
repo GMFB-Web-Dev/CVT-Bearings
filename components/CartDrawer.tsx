@@ -13,7 +13,7 @@ export function CartDrawer() {
       <div className="cart-title"><h3>Your cart</h3><button onClick={() => setOpen(false)}><X/></button></div>
       {!lines.length ? <div className="empty-cart"><ShoppingBag size={56}/><h4>Your cart is empty</h4><Link href="/bearings" onClick={() => setOpen(false)} className="button">Shop bearings</Link></div> : <>
         <div className="cart-lines">{lines.map((line) => <article key={line.productId}>
-          {line.image ? <Image src={line.image} width={86} height={86} style={{ width: 86, height: "auto" }} alt=""/> : <div className="cart-line-placeholder">No image</div>}
+          {line.image ? <span className="cart-line-image"><Image src={line.image} fill sizes="86px" alt=""/></span> : <div className="cart-line-placeholder">No image</div>}
           <div><Link href={`/products/${line.slug}`} onClick={() => setOpen(false)}>{line.title}</Link><strong>{money(line.price * line.quantity)}</strong><div className="qty"><button onClick={() => update(line.productId, line.quantity - 1)}><Minus size={13}/></button><span>{line.quantity}</span><button onClick={() => update(line.productId, line.quantity + 1)}><Plus size={13}/></button></div></div>
           <button className="remove" onClick={() => remove(line.productId)}>Remove</button>
         </article>)}</div>

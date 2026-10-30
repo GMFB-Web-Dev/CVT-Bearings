@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { BlogPostTemplate } from "@/components/BlogPostTemplates";
 import { SearchPanel } from "@/components/SharedSections";
-import { getBlogImage, getPublishedBlogPost, type BlogPost } from "@/lib/blog-posts";
+import { getBlogImage, getPublishedBlogPost, getPublishedBlogPosts, toBlogListingItem, type BlogPost } from "@/lib/blog-posts";
 import { getProducts } from "@/lib/catalog-data";
 import "../blog-templates.css";
 
@@ -77,7 +77,8 @@ function BlogJsonLd({ post }: { post: BlogPost }) {
 
 export default async function BlogPage({ params }: PageProps<"/blogs/[slug]">) {
   const { slug } = await params;
-  const [post, products] = await Promise.all([getPost(slug), getProducts()]);
+  const [post, products, posts] = await Promise.all([getPost(slug), getProducts(), getPublishedBlogPosts()]);
   if (!post) notFound();
-  return <div className="article-shell"><BlogJsonLd post={post}/><BlogPostTemplate post={post}/><SearchPanel products={products}/></div>;
+  const related = posts.filter((item) => item.slug !== slug).slice(0, 3).map(toBlogListingItem);
+  return <div className="article-shell"><BlogJsonLd post={post}/><BlogPostTemplate post={post} related={related}/><SearchPanel products={products}/></div>;
 }

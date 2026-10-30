@@ -111,7 +111,7 @@ export async function POST(request: Request) {
       product_data: {
         name: product!.title,
         description: [product!.sku && `SKU ${product!.sku}`, product!.manufacturer].filter(Boolean).join(" · ") || undefined,
-        metadata: { product_id: product!.id, slug: product!.slug },
+        metadata: { product_id: product!.id, slug: product!.slug, sku: product!.sku || "" },
       },
     },
     // Catalogue prices already include GST. Stripe's configured inclusive tax

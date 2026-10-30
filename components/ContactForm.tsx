@@ -2,10 +2,13 @@
 
 import { useRef, useState } from "react";
 import { submitEnquiry } from "@/lib/submit-enquiry";
+import { CustomSelect } from "@/components/CustomSelect";
 
 export function ContactForm({ productId = "" }: { productId?: string }) {
+  const initialService = productId ? "Product enquiry" : "General enquiry";
   const [message, setMessage] = useState("");
   const [pending, setPending] = useState(false);
+  const [service, setService] = useState(initialService);
   const formRef = useRef<HTMLFormElement>(null);
   async function submit(formData: FormData) {
     setMessage("Sending…");
@@ -23,6 +26,7 @@ export function ContactForm({ productId = "" }: { productId?: string }) {
         website: String(formData.get("website") || ""),
       });
       formRef.current?.reset();
+      setService(initialService);
       setMessage("Thanks — your enquiry has been emailed to our team.");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "We couldn't send that yet. Please call 0800 288 695.");
@@ -35,7 +39,7 @@ export function ContactForm({ productId = "" }: { productId?: string }) {
     <div className="field"><label htmlFor="contact-last-name">Last name</label><input id="contact-last-name" name="last_name" required maxLength={80} autoComplete="family-name" placeholder="Last Name"/></div>
     <div className="field"><label htmlFor="contact-email">Email</label><input id="contact-email" name="email" type="email" required maxLength={254} autoComplete="email" placeholder="Email"/></div>
     <div className="field"><label htmlFor="contact-phone">Phone</label><input id="contact-phone" name="phone" type="tel" maxLength={40} autoComplete="tel" placeholder="+64 21 345 6789"/></div>
-    <div className="field full"><label htmlFor="contact-service">Select a service</label><select id="contact-service" name="service" defaultValue={productId ? "Product enquiry" : "General enquiry"}><option>General enquiry</option><option>Product enquiry</option><option>Bulk order</option><option>Shipping & returns</option><option>Order & payment</option></select></div>
+    <div className="field full"><label htmlFor="contact-service">Select a service</label><CustomSelect id="contact-service" name="service" value={service} ariaLabel="Select a service" options={[{ value: "General enquiry", label: "General enquiry" }, { value: "Product enquiry", label: "Product enquiry" }, { value: "Bulk order", label: "Bulk order" }, { value: "Shipping & returns", label: "Shipping & returns" }, { value: "Order & payment", label: "Order & payment" }]} onChange={setService}/></div>
     <div className="field full"><label htmlFor="contact-message">Message</label><textarea id="contact-message" name="message" required maxLength={4000} placeholder={productId ? `Please quote product ${productId}` : "Type your message here…"}/></div>
     <label className="honeypot" aria-hidden="true">Website<input name="website" tabIndex={-1} autoComplete="off"/></label>
     <label className="field full terms-consent"><input type="checkbox" required/> <span>I agree to the terms and conditions</span></label>

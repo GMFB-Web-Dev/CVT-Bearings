@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { PopularTypesTabs } from "@/components/PopularTypesTabs";
 import { productSection, type Product, type ProductSection } from "@/lib/catalog";
 import { useCms } from "@/components/CmsProvider";
@@ -37,9 +36,6 @@ export function PopularTypesSection({
     <div className="page-width">
       <h2>{c("copy-004", "Shop by popular")} <em>{c("copy-005", "bearing types")}</em></h2>
       <PopularTypesTabs categories={categories} initialSection={activeSection}/>
-      <div className="popular-types-catalogue-link">
-        <Link className="button catalogue-button" href={c("copy-006", "/bearings")}>{c("copy-007", "View full catalogue")}</Link>
-      </div>
     </div>
   </section>;
 }

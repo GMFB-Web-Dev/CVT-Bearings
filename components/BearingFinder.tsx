@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Ruler, Search } from "lucide-react";
 import { useEffect, useState } from "react";
+import { CustomSelect } from "@/components/CustomSelect";
 
 type FinderResult = {
   id: string;
@@ -62,7 +63,6 @@ export function BearingFinder({ vehicleBrands, bearingTypes }: { vehicleBrands: 
   return <section className="find-panel">
     <div className="find-box">
       <h2>Find the right <em>bearing for you</em></h2>
-      <p className="finder-intro">Search by part number, vehicle, transmission, bearing name—or use the exact measurements if you have them.</p>
       <form action="/bearings" className="finder-form" role="search">
         <label htmlFor="finder-query">Search for anything</label>
         <div className="find-search">
@@ -75,14 +75,8 @@ export function BearingFinder({ vehicleBrands, bearingTypes }: { vehicleBrands: 
           <span><Ruler size={15}/> Measurements match within ±1 mm</span>
         </div>
         <div className="specifics finder-specifics">
-          <select id="finder-brand" name="brand" value={brand} onChange={(event) => setBrand(event.target.value)}>
-            <option value="">Vehicle make</option>
-            {vehicleBrands.map((item) => <option value={item} key={item}>{item}</option>)}
-          </select>
-          <select name="type" value={type} onChange={(event) => setType(event.target.value)} aria-label="Bearing type">
-            <option value="">Bearing type</option>
-            {bearingTypes.map((item) => <option value={item.value} key={item.value}>{item.label}</option>)}
-          </select>
+          <CustomSelect id="finder-brand" name="brand" value={brand} ariaLabel="Vehicle make" options={[{ value: "", label: "Vehicle make" }, ...vehicleBrands.map((item) => ({ value: item, label: item }))]} onChange={setBrand}/>
+          <CustomSelect id="finder-type" name="type" value={type} ariaLabel="Bearing type" options={[{ value: "", label: "Bearing type" }, ...bearingTypes]} onChange={setType}/>
           <div className="finder-dimensions" aria-label="Bearing dimensions in millimetres">
             <label><span>Inside Ø</span><input name="inner" value={inner} onChange={(event) => setInner(event.target.value)} inputMode="decimal" placeholder="mm" aria-label="Inside diameter in millimetres"/></label>
             <label><span>Outside Ø</span><input name="outer" value={outer} onChange={(event) => setOuter(event.target.value)} inputMode="decimal" placeholder="mm" aria-label="Outside diameter in millimetres"/></label>

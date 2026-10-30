@@ -74,7 +74,7 @@ export function Header() {
   return <>
     <div className={`offer-bar${offerVisible ? "" : " dismissed"}`} aria-label={c("copy-002", "First order discount")} aria-hidden={!offerVisible}>
       <div className="offer-track">
-        {[0, 1].map((group) => <div className="offer-group" key={group} aria-hidden={group === 1}>{offerItems.map((item, index) => <span className="offer-item" key={`${group}-${index}`}>{item}</span>)}</div>)}
+        {[0, 1].map((group) => <div className="offer-group" key={group} aria-hidden={group === 1}>{offerItems.map((item, index) => <Link className="offer-item" href="/login-sign-up?mode=signup" key={`${group}-${index}`}>{item}</Link>)}</div>)}
       </div>
       <button className="offer-dismiss" type="button" onClick={() => setOfferVisible(false)} aria-label={c("copy-003", "Close first order discount")}><X size={18}/></button>
     </div>
@@ -89,6 +89,7 @@ export function Header() {
           <ActiveLink href="/home" exact onClick={() => setMenu(false)}>{c("copy-026", "Home")}</ActiveLink>
           <div className="nav-dropdown"><ActiveLink href="/bearings" match={["/products"]} onClick={() => setMenu(false)}>{nav("/bearings", c("copy-028", "Shop bearings"))} <ChevronDown size={15}/></ActiveLink><div><ActiveLink href="/bearings/main-bearing-kits" onClick={() => setMenu(false)}>{nav("/bearings/main-bearing-kits", c("copy-030", "Main bearing kits"))}</ActiveLink><ActiveLink href="/bearings/pulley-bearings" onClick={() => setMenu(false)}>{nav("/bearings/pulley-bearings", c("copy-032", "Pulley bearings"))}</ActiveLink><ActiveLink href="/bearings/primary-pulley-bearings" onClick={() => setMenu(false)}>{nav("/bearings/primary-pulley-bearings", c("copy-034", "Primary pulley bearings"))}</ActiveLink></div></div>
           <ActiveLink href="/general-info" match={["/shipping-and-returns", "/orders-and-payments"]} onClick={() => setMenu(false)}>{nav("/help", c("copy-036", "General information"))}</ActiveLink>
+          <ActiveLink href="/blogs" onClick={() => setMenu(false)}>{nav("/blogs", c("copy-039", "Blogs"))}</ActiveLink>
         </nav>
         <SmartSearch/>
         <Link href={firstName ? "/account" : "/login-sign-up"} className="mobile-account" aria-label={firstName ? `${firstName}'s account` : "Sign in or create an account"}><UserRound/></Link>

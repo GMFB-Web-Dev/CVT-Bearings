@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import { GoogleTagManager } from "@next/third-parties/google";
-import { Geist } from "next/font/google";
+import { Geist, Inter, Manrope, Montserrat } from "next/font/google";
 import "./globals.css";
 import "./legal.css";
 import "./cms.css";
+import "./storefront-refresh.css";
 import { CartProvider } from "@/components/CartProvider";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -16,6 +17,21 @@ import type { CSSProperties } from "react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
+
+const montserrat = Montserrat({
+  variable: "--font-montserrat",
+  subsets: ["latin"],
+});
+
+const manrope = Manrope({
+  variable: "--font-manrope",
+  subsets: ["latin"],
+});
+
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
 });
 
@@ -46,7 +62,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${geistSans.variable}`}
+      className={`${geistSans.variable} ${montserrat.variable} ${manrope.variable} ${inter.variable}`}
       data-scroll-behavior="smooth"
     >
       {gtmId && <GoogleTagManager gtmId={gtmId}/>}

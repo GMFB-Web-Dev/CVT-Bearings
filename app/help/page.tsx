@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
-import { CircleHelp, MessagesCircle, Store, Truck, UserRound, WalletCards, type LucideIcon } from "lucide-react";
 import { BrandMarquee, SearchPanel } from "@/components/SharedSections";
 import { getProducts } from "@/lib/catalog-data";
 import { entry, getPage, section } from "@/lib/cms";
@@ -28,10 +28,10 @@ export default async function HelpPage() {
     [c("copy-010", "Can I order online directly through the website?"), c("copy-011", "Fixed-price products can be added to cart; products needing confirmation use a quote workflow.")],
     [c("copy-012", "What information should I send if I am unsure which part I need?"), c("copy-013", "Send your transmission code, vehicle details, part numbers, dimensions and photos.")],
   ];
-  const cards: Array<[LucideIcon, string, string]> = [
-    [Truck, c("copy-014", "Shipping & Returns"), "/shipping-and-returns"], [WalletCards, c("copy-015", "Orders & Payments"), "/orders-and-payments"],
-    [Store, c("copy-016", "Product & Store"), "/bearings"], [CircleHelp, c("copy-017", "About us"), "/about-us"],
-    [MessagesCircle, c("copy-018", "Contact Us"), "/contact"], [UserRound, c("copy-019", "Log in / Sign up"), "/login-sign-up"],
+  const cards: Array<[string, string, string]> = [
+    ["/assets/help-shipping.svg", c("copy-014", "Shipping & Returns"), "/shipping-and-returns"], ["/assets/help-orders.svg", c("copy-015", "Orders & Payments"), "/orders-and-payments"],
+    ["/assets/help-store.svg", c("copy-016", "Product & Store"), "/bearings"], ["/assets/help-about.svg", c("copy-017", "About us"), "/about-us"],
+    ["/assets/help-contact.svg", c("copy-018", "Contact Us"), "/contact"], ["/assets/help-login.svg", c("copy-019", "Log in / Sign up"), "/login-sign-up"],
   ];
-  return <div className="help-page"><section className="content-section help-content"><h1>{c("copy-020", "How can")} <em>{c("copy-021", "we help?")}</em></h1><div className="help-grid">{cards.map(([Icon, label, href]) => <Link key={label} href={href}><Icon aria-hidden="true"/><h3>{label}</h3></Link>)}</div><div className="faq section"><h2>{c("copy-022", "FAQs")}</h2>{faqs.map(([question, answer]) => <details key={question}><summary>{question}</summary><p>{answer}</p></details>)}</div></section><BrandMarquee/><SearchPanel products={products}/></div>;
+  return <div className="help-page"><section className="content-section help-content"><h1>{c("copy-020", "How can")} <em>{c("copy-021", "we help?")}</em></h1><div className="help-grid">{cards.map(([icon, label, href]) => <Link key={label} href={href}><Image src={icon} width={92} height={92} alt="" aria-hidden="true"/><h3>{label}</h3></Link>)}</div><div className="faq section"><h2>{c("copy-022", "FAQs")}</h2>{faqs.map(([question, answer]) => <details key={question}><summary>{question}</summary><p>{answer}</p></details>)}</div></section><BrandMarquee/><SearchPanel products={products}/></div>;
 }

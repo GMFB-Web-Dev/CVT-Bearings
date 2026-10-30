@@ -64,9 +64,48 @@ export type BlogListingItem = {
   image?: string | null;
   imageAlt?: string | null;
   tag: string;
+  filterTopics: string[];
+  vehicleMakes: string[];
+  symptoms: string[];
+  transmissions: string[];
   excerpt?: string | null;
   publishedAt?: string | null;
 };
+
+const VEHICLE_MAKES = ["Nissan", "Toyota", "Subaru", "Mitsubishi", "Honda", "Suzuki", "Mazda", "Hyundai / Kia"];
+const TRANSMISSIONS = ["K313", "HCF2", "6F35", "JF015E", "TR580", "TR690"];
+
+function matches(text: string, patterns: RegExp[]) {
+  return patterns.some((pattern) => pattern.test(text));
+}
+
+function inferTopics(category: string, text: string) {
+  const topics = new Set<string>();
+  if (/diagnostic/i.test(category) || matches(text, [/noise/, /warning light/, /vibrat/, /symptom/, /fail/])) {
+    topics.add("Bearing Problems & Symptoms");
+    topics.add("Diagnosis & Troubleshooting");
+  }
+  if (/product guide/i.test(category) || matches(text, [/repair/, /replacement/, /replace/, /rebuild/])) topics.add("Repairs & Replacement");
+  if (/workshop/i.test(category) || matches(text, [/maintenance/, /prevent/, /handling/, /storage/, /installation habit/])) topics.add("Maintenance & Prevention");
+  if (/buying guide|product guide/i.test(category) || matches(text, [/vehicle/, /transmission code/, /cvt application/])) topics.add("Vehicle & Transmission Guides");
+  if (/product guide|practical advice|buying guide/i.test(category) || matches(text, [/measurement/, /technical/, /identif/, /pulley/])) topics.add("Technical Guides");
+  if (/ordering|workshop|buying guide|practical advice/i.test(category)) topics.add("Workshop & Buying Advice");
+  return [...topics];
+}
+
+function inferSymptoms(text: string) {
+  const rules: [string, RegExp[]][] = [
+    ["Whining / Noise", [/whin/, /noise/, /hum/, /rumble/]],
+    ["Shuddering / Juddering", [/shudder/, /judder/]],
+    ["Slipping", [/slip/]],
+    ["Overheating", [/overheat/, /high temperature/, /temperature warning/]],
+    ["Loss of Drive", [/loss of drive/, /loses drive/, /lost drive/, /no drive/]],
+    ["Warning Lights", [/warning light/, /fault light/, /dashboard light/]],
+    ["Delayed Engagement", [/delayed engagement/, /delay(?:ed)?.{0,20}engag/]],
+    ["Vibration", [/vibrat/]],
+  ];
+  return rules.filter(([, patterns]) => matches(text, patterns)).map(([label]) => label);
+}
 
 function payloadOrigin() {
   return (process.env.NEXT_PUBLIC_PAYLOAD_URL || "https://payload.gmfb.co.nz").replace(/\/$/, "");
@@ -140,12 +179,21 @@ export function getBlogImage(post: BlogPost) {
 
 export function toBlogListingItem(post: BlogPost): BlogListingItem {
   const image = getBlogImage(post);
+  const category = post.category || "Article";
+  const filterText = [post.title, post.excerpt, category, post.tools, post.caseStudy?.vehicle, JSON.stringify(post.body || {})]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
   return {
     slug: post.slug,
     title: post.title,
     image: image?.url,
     imageAlt: post.featuredImageAlt || image?.alt || post.title,
-    tag: post.category || "Article",
+    tag: category,
+    filterTopics: inferTopics(category, filterText),
+    vehicleMakes: VEHICLE_MAKES.filter((make) => make.split(" / ").some((name) => filterText.includes(name.toLowerCase()))),
+    symptoms: inferSymptoms(filterText),
+    transmissions: TRANSMISSIONS.filter((transmission) => filterText.includes(transmission.toLowerCase())),
     excerpt: post.excerpt,
     publishedAt: post.publishedAt,
   };

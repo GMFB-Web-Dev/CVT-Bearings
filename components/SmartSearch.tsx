@@ -64,7 +64,7 @@ export function SmartSearch() {
           }
         }}
         onKeyDown={(event) => { if (event.key === "Escape") setOpen(false); }}
-        placeholder="Search part number or bearing"
+        placeholder="Search Part"
         aria-label="Search products"
         role="combobox"
         aria-autocomplete="list"

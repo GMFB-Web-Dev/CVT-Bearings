@@ -36,27 +36,31 @@ export function CartPage({ checkoutCancelled = false }: { checkoutCancelled?: bo
     }
   }
 
-  if (!lines.length) return <div className="page-width"><h1>Your cart</h1><p>Your cart is empty.</p><Link className="button" href="/bearings">Shop bearings</Link></div>;
+  if (!lines.length) return <div className="page-width cart-empty-page"><h1>Your cart</h1><p>Your cart is empty.</p><Link className="button" href="/bearings">Shop bearings</Link></div>;
 
   return <div className="page-width">
     <h1>Your cart</h1>
     {checkoutCancelled && <p className="notice">Checkout was cancelled. Your cart is still here.</p>}
-    <table className="cart-table"><thead><tr><th>Product</th><th>Price</th><th>Quantity</th><th>Total</th><th/></tr></thead><tbody>
-      {lines.map((line) => <tr key={line.productId}>
-        <td>{line.image ? <Image src={line.image} width={90} height={90} alt=""/> : <span className="cart-line-placeholder">No image</span>} <Link href={`/products/${line.slug}`}>{line.title}</Link></td>
-        <td>{money(line.price)}</td>
-        <td><div className="cart-quantity"><button type="button" onClick={() => update(line.productId, line.quantity - 1)} aria-label={`Decrease ${line.title} quantity`}>−</button><span>{line.quantity}</span><button type="button" onClick={() => update(line.productId, line.quantity + 1)} aria-label={`Increase ${line.title} quantity`}>+</button></div></td>
-        <td>{money(line.quantity * line.price)}</td>
-        <td><button className="cart-remove" onClick={() => remove(line.productId)}>Remove</button></td>
-      </tr>)}
-    </tbody></table>
-    <aside className="cart-totals">
-      <h3>Cart totals</h3>
-      <p><span>Subtotal</span><b>{money(total)}</b></p>
-      <small>Prices include GST. Delivery and the GST portion are shown in secure checkout before you pay.</small>
-      {error && <p className="error" role="alert">{error}</p>}
-      <button className="button wide checkout-button" onClick={checkout} disabled={loading}><LockKeyhole size={17}/>{loading ? "Opening secure checkout…" : "Secure checkout"}</button>
-      <small className="stripe-note">Payments are processed securely by Stripe.</small>
-    </aside>
+    <div className="cart-layout">
+      <div className="cart-items" aria-label="Cart items">
+        <table className="cart-table"><thead><tr><th>Product</th><th>Price</th><th>Quantity</th><th>Total</th><th/></tr></thead><tbody>
+          {lines.map((line) => <tr key={line.productId}>
+            <td><div className="cart-product">{line.image ? <Image src={line.image} width={90} height={90} alt=""/> : <span className="cart-line-placeholder">No image</span>}<Link href={`/products/${line.slug}`}>{line.title}</Link></div></td>
+            <td className="cart-price">{money(line.price)}</td>
+            <td><div className="cart-quantity"><button type="button" onClick={() => update(line.productId, line.quantity - 1)} aria-label={`Decrease ${line.title} quantity`}>−</button><span>{line.quantity}</span><button type="button" onClick={() => update(line.productId, line.quantity + 1)} aria-label={`Increase ${line.title} quantity`}>+</button></div></td>
+            <td className="cart-price">{money(line.quantity * line.price)}</td>
+            <td><button className="cart-remove" onClick={() => remove(line.productId)}>Remove</button></td>
+          </tr>)}
+        </tbody></table>
+      </div>
+      <aside className="cart-totals">
+        <h2>Cart totals</h2>
+        <p className="cart-subtotal"><span>Subtotal</span><b>{money(total)}</b></p>
+        <small>Prices include GST. Delivery and the GST portion are shown in secure checkout before you pay.</small>
+        {error && <p className="error" role="alert">{error}</p>}
+        <button className="button wide checkout-button" onClick={checkout} disabled={loading}><LockKeyhole size={17}/>{loading ? "Opening secure checkout…" : "Secure checkout"}</button>
+        <small className="stripe-note">Payments are processed securely by Stripe.</small>
+      </aside>
+    </div>
   </div>;
 }

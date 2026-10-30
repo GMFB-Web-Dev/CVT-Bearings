@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { Star, Upload, X } from "lucide-react";
+import { Check, CircleCheck, Star, Upload, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { SITE_KEY } from "@/lib/catalog";
+import { CustomSelect } from "@/components/CustomSelect";
 
 type ReviewMedia = { key: string; url: string | null; name: string; type: string };
 type Review = {
@@ -15,6 +16,7 @@ type Review = {
   display_name: string;
   created_at: string;
   verified_purchase: boolean;
+  recommended: boolean;
   media: ReviewMedia[] | null;
 };
 
@@ -24,7 +26,7 @@ async function fetchReviews(productId: string) {
   const supabase = createClient();
   const { data } = await supabase
     .from("reviews")
-    .select("id,rating,title,body,display_name,created_at,verified_purchase,media")
+    .select("id,rating,title,body,display_name,created_at,verified_purchase,recommended,media")
     .eq("site_key", SITE_KEY)
     .eq("product_id", productId)
     .order("created_at", { ascending: false });
@@ -92,6 +94,7 @@ export function Reviews({ productId }: { productId: string }) {
         title: String(formData.get("title") || ""),
         body: String(formData.get("body") || ""),
         display_name: String(formData.get("name") || user.email?.split("@")[0] || "Customer"),
+        recommended: formData.get("recommended") === "yes",
         media,
       });
       if (error) throw error;
@@ -109,18 +112,18 @@ export function Reviews({ productId }: { productId: string }) {
   return <section className="reviews-section">
     <h2>Reviews</h2>
     <div className={reviews.length ? "rating-summary" : "rating-summary no-ratings"}>
-      <div className="rating-snapshot"><small>Rating Snapshot</small><p>Select a row below to filter reviews.</p>{[5, 4, 3, 2, 1].map((rating) => {
+      {reviews.length > 0 && <div className="rating-snapshot"><small>Rating Snapshot</small><p>Select a row below to filter reviews.</p>{[5, 4, 3, 2, 1].map((rating) => {
         const count = reviews.filter((review) => review.rating === rating).length;
         const width = reviews.length ? `${(count / reviews.length) * 100}%` : "0%";
         return <button type="button" key={rating} onClick={() => { setSort("rating"); setPage(1); }}><span>{rating} stars</span><i><b style={{ width }}/></i><em>{count}</em></button>;
-      })}</div>
-      <div className="overall-rating"><small>Overall rating</small><div><strong>{average ? average.toFixed(1) : "—"}</strong><span><b>{"★".repeat(Math.round(average))}{"☆".repeat(5 - Math.round(average))}</b><small>{reviews.length} reviews</small></span></div></div>
+      })}</div>}
+      {reviews.length > 0 && <div className="overall-rating"><small>Overall rating</small><div><strong>{average ? average.toFixed(1) : "—"}</strong><span><b>{"★".repeat(Math.round(average))}{"☆".repeat(5 - Math.round(average))}</b><small>{reviews.length} reviews</small></span></div></div>}
       <div className="review-launcher"><small>Review this Product</small><div className="review-star-buttons" onMouseLeave={() => setHoverRating(0)}>{[1, 2, 3, 4, 5].map((rating) => <button type="button" className={rating <= (hoverRating || selectedRating) ? "active" : ""} onMouseEnter={() => setHoverRating(rating)} onFocus={() => setHoverRating(rating)} onClick={() => chooseRating(rating)} aria-label={`Write a ${rating} star review`} key={rating}><Star/></button>)}</div><p>Adding a review will require a valid email for verification.</p></div>
     </div>
-    {reviews.length > 0 && <div className="review-tools"><label>Sort by: <select value={sort} onChange={(event) => { setSort(event.target.value); setPage(1); }}><option value="recent">Most relevant</option><option value="rating">Highest rated</option></select></label></div>}
-    <div className="review-list">{visibleReviews.map((review) => <article key={review.id}><div className="stars">{"★".repeat(review.rating)}{"☆".repeat(5 - review.rating)}</div><h4>{review.title || "Product review"}</h4><p>{review.body}</p><p className="review-recommend">✓ Yes, I recommend this product.</p><b>{review.display_name}</b> {review.verified_purchase && <small>✓ Verified purchase</small>}<br/><small>{new Date(review.created_at).toLocaleDateString("en-NZ")}</small>{review.media?.length ? <div className="review-media-links">{review.media.map((item) => item.url && <a href={item.url} target="_blank" rel="noreferrer" key={item.key}>{item.name}</a>)}</div> : null}</article>)}{!reviews.length && <div className="empty-reviews"><p>No reviews yet. Select a star above to be the first to review this product.</p></div>}</div>
-    {reviews.length > 0 && <div className="review-pagination"><span>Showing {(currentPage - 1) * PAGE_SIZE + 1}–{Math.min(currentPage * PAGE_SIZE, reviews.length)} of {reviews.length} Reviews</span><nav aria-label="Review pages"><button type="button" disabled={currentPage === 1} onClick={() => setPage((value) => value - 1)}>‹</button>{Array.from({ length: pageCount }, (_, index) => <button type="button" className={currentPage === index + 1 ? "active" : ""} onClick={() => setPage(index + 1)} key={index}>{index + 1}</button>)}<button type="button" disabled={currentPage === pageCount} onClick={() => setPage((value) => value + 1)}>›</button></nav></div>}
+    {reviews.length > 0 && <div className="review-tools"><div className="sort-control"><span>Sort by:</span><CustomSelect ariaLabel="Sort reviews" variant="accent" value={sort} options={[{ value: "recent", label: "Most relevant" }, { value: "rating", label: "Highest rated" }]} onChange={(nextSort) => { setSort(nextSort); setPage(1); }}/></div></div>}
+    <div className="review-list">{visibleReviews.map((review) => <article key={review.id}><div className="stars">{"★".repeat(review.rating)}{"☆".repeat(5 - review.rating)}</div><h4>{review.title || "Product review"}</h4><p>{review.body}</p>{review.recommended && <p className="review-recommend"><CircleCheck aria-hidden="true"/><strong>Yes, I recommend this product.</strong></p>}<b>{review.display_name}</b> {review.verified_purchase && <small>✓ Verified purchase</small>}<br/><small>{new Date(review.created_at).toLocaleDateString("en-NZ")}</small>{review.media?.length ? <div className="review-media-links">{review.media.map((item) => item.url && <a href={item.url} target="_blank" rel="noreferrer" key={item.key}>{item.name}</a>)}</div> : null}</article>)}{!reviews.length && <div className="empty-reviews"><p>No reviews yet. Select a star above to be the first to review this product.</p></div>}</div>
+    {reviews.length > 0 && <div className="review-pagination"><span>Showing {(currentPage - 1) * PAGE_SIZE + 1}–{Math.min(currentPage * PAGE_SIZE, reviews.length)} of {reviews.length} Reviews</span><nav className="pagination" aria-label="Review pages"><button type="button" disabled={currentPage === 1} onClick={() => setPage((value) => value - 1)}>‹</button>{Array.from({ length: pageCount }, (_, index) => <button type="button" className={currentPage === index + 1 ? "active" : ""} onClick={() => setPage(index + 1)} key={index}>{index + 1}</button>)}<button type="button" disabled={currentPage === pageCount} onClick={() => setPage((value) => value + 1)}>›</button></nav></div>}
     {message && <p className={message.startsWith("Thanks") ? "notice review-message" : "error review-message"}>{message}</p>}
-    {modalOpen && <div className="review-modal-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setModalOpen(false); }}><div className="review-modal" role="dialog" aria-modal="true" aria-labelledby="review-modal-title"><button type="button" className="review-modal-close" onClick={() => setModalOpen(false)} aria-label="Close review form"><X/></button><div className="review-modal-heading"><span>{"★".repeat(selectedRating)}{"☆".repeat(5 - selectedRating)}</span><h3 id="review-modal-title">Tell us about this bearing</h3><p>Your review will be checked before it appears publicly.</p></div><form action={submit}><label>Display name<input name="name" required maxLength={80} placeholder="Your name"/></label><label>Review title<input name="title" maxLength={120} placeholder="Summarise your experience"/></label><label className="full">Your review<textarea name="body" required minLength={5} maxLength={4000} placeholder="What should other customers know?"/></label><label className="review-upload full"><Upload/><span><b>Add photos or video</b><small>Up to 5 files, 10 MB each. JPG, PNG, WebP, MP4 or WebM.</small></span><input name="media" type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm" multiple/></label><p className="full review-auth-note">You must be signed in with a valid email to submit. <Link href="/login-sign-up">Sign in or create an account</Link>.</p><button className="button full" disabled={submitting}>{submitting ? "Submitting…" : "Submit review"}</button></form></div></div>}
+    {modalOpen && <div className="review-modal-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setModalOpen(false); }}><div className="review-modal" role="dialog" aria-modal="true" aria-labelledby="review-modal-title"><button type="button" className="review-modal-close" onClick={() => setModalOpen(false)} aria-label="Close review form"><X/></button><div className="review-modal-heading"><span>{"★".repeat(selectedRating)}{"☆".repeat(5 - selectedRating)}</span><h3 id="review-modal-title">Tell us about this bearing</h3><p>Your review will be checked before it appears publicly.</p></div><form action={submit}><label>Display name<input name="name" required maxLength={80} placeholder="Your name"/></label><label>Review title<input name="title" maxLength={120} placeholder="Summarise your experience"/></label><label className="full">Your review<textarea name="body" required minLength={5} maxLength={4000} placeholder="What should other customers know?"/></label><label className="review-recommend-field full"><input type="checkbox" name="recommended" value="yes" defaultChecked/><span className="review-recommend-check" aria-hidden="true"><Check/></span><span><b>Would you recommend this product to others?</b><small>Select this if your answer is yes.</small></span></label><label className="review-upload full"><Upload/><span><b>Add photos or video</b><small>Up to 5 files, 10 MB each. JPG, PNG, WebP, MP4 or WebM.</small></span><input name="media" type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm" multiple/></label><p className="full review-auth-note">You must be signed in with a valid email to submit. <Link href="/login-sign-up">Sign in or create an account</Link>.</p><button className="button full" disabled={submitting}>{submitting ? "Submitting…" : "Submit review"}</button></form></div></div>}
   </section>;
 }
