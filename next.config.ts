@@ -3,6 +3,9 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
+  experimental: {
+    agentUpgrade: "security",
+  },
   redirects: async () => [
     { source: "/", destination: "/home", permanent: true },
     { source: "/about", destination: "/about-us", permanent: true },
