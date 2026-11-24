@@ -80,7 +80,7 @@ export function Header() {
     </div>
     <div className="sticky-navigation">
       <div className="network-bar">
-        <div className="network-links"><a href={c("copy-004", "https://cvtnz.co.nz")}>{c("copy-005", "CVT")}<span>{c("copy-006", "NZ")}</span></a><Link className="active" href={c("copy-007", "/home")}>{c("copy-008", "CVT")}<small>{c("copy-009", "Bearings")}</small></Link><a href={c("copy-010", "https://cvt-parts.co.nz")}>{c("copy-011", "CVT")}<small>{c("copy-012", "Parts")}</small></a></div>
+        <div className="network-links"><a href="https://cvt.co.nz/">cvt.co.nz</a><Link className="active" href={c("copy-007", "/home")}>{c("copy-008", "CVT")}<small>{c("copy-009", "Bearings")}</small></Link><a href={c("copy-010", "https://cvt-parts.co.nz")}>{c("copy-011", "CVT")}<small>{c("copy-012", "Parts")}</small></a></div>
         <div className="utility-links"><ActiveLink href="/about-us">{nav("/about", c("copy-014", "About"))}</ActiveLink><ActiveLink href="/contact">{nav("/contact", c("copy-016", "Contact"))}</ActiveLink><ActiveLink href={firstName ? "/account" : "/login-sign-up"} match={["/login", "/account"]}>{firstName ? c("copy-017", "Hi, ${firstName}").replace("${firstName}", firstName) : c("copy-018", "Sign in / Sign up")}</ActiveLink><Link href={c("copy-019", "/account#wishlist")} className="utility-icon" aria-label={c("copy-020", "Wishlist")}><Heart size={17}/></Link><button onClick={() => setOpen(true)} aria-label={c("copy-021", "Open cart")}><ShoppingCart size={18}/>{count > 0 && <b>{count}</b>}</button></div>
       </div>
       <header className="main-header">

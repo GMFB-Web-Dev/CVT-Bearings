@@ -32,8 +32,38 @@ async function payloadList<T>(collection: string, params: URLSearchParams, tags:
 function baseParams({ drafts = true } = {}) { const params = new URLSearchParams({ depth: "2", limit: "100" }); params.set("where[tenant][equals]", String(PAYLOAD_TENANT_ID)); if (drafts) params.set("where[_status][equals]", "published"); return params; }
 export async function getPage(path: string) { const params = baseParams(); params.set("where[path][equals]", path); params.set("limit", "1"); return (await payloadList<CmsPage>("pages", params, [TENANT_TAG, PAGES_TAG, pageTag(path)]))[0] ?? null; }
 export function getPages() { return payloadList<CmsPage>("pages", baseParams(), [TENANT_TAG, PAGES_TAG]); }
-export async function getSiteSettings() { return (await payloadList<SiteSettings>("tenant-site-settings", baseParams({ drafts: false }), [TENANT_TAG, SHARED_TAG]))[0] ?? null; }
-export async function getNavigation() { return (await payloadList<Navigation>("navigation", baseParams({ drafts: false }), [TENANT_TAG, SHARED_TAG]))[0] ?? null; }
+const oldCvtDomain = /^(?:(?:https?:)?\/\/)?(?:www\.)?cvtnz\.co\.nz(?=[:/?#]|$)/i;
+const cvtDomain = "https://cvt.co.nz";
+
+function fixCvtDomain(value: string) {
+  return typeof value === "string" ? value.replace(oldCvtDomain, cvtDomain) : value;
+}
+
+function fixCvtLink(link: CmsLink): CmsLink {
+  const url = fixCvtDomain(link.url);
+  return url === link.url ? link : { ...link, url, label: "cvt.co.nz" };
+}
+
+export async function getSiteSettings() {
+  const settings = (await payloadList<SiteSettings>("tenant-site-settings", baseParams({ drafts: false }), [TENANT_TAG, SHARED_TAG]))[0];
+  if (!settings) return null;
+  return {
+    ...settings,
+    contentSections: settings.contentSections?.map((item) => ({
+      ...item,
+      entries: item.entries?.map((entry) => ({ ...entry, text: fixCvtDomain(entry.text) })),
+    })),
+  };
+}
+export async function getNavigation() {
+  const navigation = (await payloadList<Navigation>("navigation", baseParams({ drafts: false }), [TENANT_TAG, SHARED_TAG]))[0];
+  return navigation ? {
+    ...navigation,
+    headerLinks: navigation.headerLinks?.map(fixCvtLink),
+    footerLinks: navigation.footerLinks?.map(fixCvtLink),
+    headerCTA: navigation.headerCTA && fixCvtLink(navigation.headerCTA),
+  } : null;
+}
 export function section(source: { contentSections?: CmsSection[] } | null | undefined, key: string) { return source?.contentSections?.find((item) => item.key === key); }
 export function entry(source: CmsSection | null | undefined, key: string, fallback: string) { return source?.entries?.find((item) => item.key === key)?.text || fallback; }
 export function assetURL(source: { siteAssets?: CmsAsset[] } | null | undefined, key: string, fallback: string) { const asset = source?.siteAssets?.find((item) => item.key === key)?.asset; const path = asset && typeof asset === "object" ? asset.url : null; if (!path) return fallback; return path.startsWith("http") ? path : `${payloadOrigin()}${path.startsWith("/") ? "" : "/"}${path}`; }
