@@ -7,7 +7,7 @@ const nextConfig: NextConfig = {
     agentUpgrade: "security",
   },
   redirects: async () => [
-    { source: "/", destination: "/home", permanent: true },
+    { source: "/home", destination: "/", permanent: false },
     { source: "/about", destination: "/about-us", permanent: true },
     { source: "/help", destination: "/general-info", permanent: true },
     { source: "/shipping-returns", destination: "/shipping-and-returns", permanent: true },

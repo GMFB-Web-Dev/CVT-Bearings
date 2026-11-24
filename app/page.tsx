@@ -11,7 +11,7 @@ import { createPageMetadata } from "@/lib/seo";
 export const metadata: Metadata = createPageMetadata({
   title: "CVT Bearings | CVT Bearings & Transmission Parts NZ",
   description: "CVT Bearings supplies CVT bearings and transmission parts across New Zealand, helping workshops and vehicle owners find the right parts for CVT repair and servicing.",
-  path: "/home",
+  path: "/",
   keywords: ["CVT Bearings NZ", "CVT Transmission Parts NZ", "CVT Parts NZ"],
   image: "/assets/hero.jpg",
   imageTitle: "CVT Bearings and CVT transmission parts supplied across New Zealand",

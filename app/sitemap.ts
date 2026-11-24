@@ -6,8 +6,8 @@ import { getPages, type CmsPage } from "@/lib/cms";
 
 const FALLBACK_ORIGIN = "https://www.cvtbearings.co.nz";
 const PRIVATE_PATHS = new Set(["/account", "/cart", "/checkout/success", "/login", "/login-sign-up"]);
-const REDIRECT_PATHS = new Set(["/", "/about", "/help", "/orders-payments", "/shipping-returns"]);
-const CORE_PATHS = ["/home", "/about-us", "/bearings", "/blogs", "/contact", "/general-info", "/orders-and-payments", "/shipping-and-returns", "/privacy", "/terms", "/cookies"];
+const REDIRECT_PATHS = new Set(["/home", "/about", "/help", "/orders-payments", "/shipping-returns"]);
+const CORE_PATHS = ["/", "/about-us", "/bearings", "/blogs", "/contact", "/general-info", "/orders-and-payments", "/shipping-and-returns", "/privacy", "/terms", "/cookies"];
 
 function siteOrigin() {
   const configured = process.env.NEXT_PUBLIC_SITE_URL?.trim();
@@ -29,7 +29,7 @@ function indexablePath(path: string) {
 }
 
 function pageSettings(path: string): Pick<MetadataRoute.Sitemap[number], "changeFrequency" | "priority"> {
-  if (path === "/home") return { changeFrequency: "weekly", priority: 1 };
+  if (path === "/") return { changeFrequency: "weekly", priority: 1 };
   if (path === "/bearings" || path.startsWith("/bearings/")) return { changeFrequency: "weekly", priority: 0.9 };
   if (path === "/blogs" || path.startsWith("/blogs/")) return { changeFrequency: "monthly", priority: 0.7 };
   if (["/privacy", "/terms", "/cookies"].includes(path)) return { changeFrequency: "yearly", priority: 0.3 };
@@ -56,7 +56,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     if (!indexablePath(path)) continue;
     const page: CmsPage | undefined = cmsByPath.get(path);
     entries.set(path, {
-      url: `${origin}${path === "/" ? "" : path}`,
+      url: `${origin}${path}`,
       lastModified: validDate(page?.updatedAt),
       ...pageSettings(path),
     });

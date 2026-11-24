@@ -39,9 +39,18 @@ function fixCvtDomain(value: string) {
   return typeof value === "string" ? value.replace(oldCvtDomain, cvtDomain) : value;
 }
 
+function fixHomePath(value: string) {
+  return typeof value === "string" ? value.replace(/^\/home\/?(?=[?#]|$)/, "/") : value;
+}
+
 function fixCvtLink(link: CmsLink): CmsLink {
-  const url = fixCvtDomain(link.url);
-  return url === link.url ? link : { ...link, url, label: "cvt.co.nz" };
+  const correctedDomain = fixCvtDomain(link.url);
+  const url = fixHomePath(correctedDomain);
+  return url === link.url ? link : {
+    ...link,
+    url,
+    label: correctedDomain === link.url ? link.label : "cvt.co.nz",
+  };
 }
 
 export async function getSiteSettings() {
@@ -51,7 +60,7 @@ export async function getSiteSettings() {
     ...settings,
     contentSections: settings.contentSections?.map((item) => ({
       ...item,
-      entries: item.entries?.map((entry) => ({ ...entry, text: fixCvtDomain(entry.text) })),
+      entries: item.entries?.map((entry) => ({ ...entry, text: fixHomePath(fixCvtDomain(entry.text)) })),
     })),
   };
 }

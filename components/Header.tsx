@@ -80,13 +80,13 @@ export function Header() {
     </div>
     <div className="sticky-navigation">
       <div className="network-bar">
-        <div className="network-links"><a href="https://cvt.co.nz/">cvt.co.nz</a><Link className="active" href={c("copy-007", "/home")}>{c("copy-008", "CVT")}<small>{c("copy-009", "Bearings")}</small></Link><a href={c("copy-010", "https://cvt-parts.co.nz")}>{c("copy-011", "CVT")}<small>{c("copy-012", "Parts")}</small></a></div>
+        <div className="network-links"><a href="https://cvt.co.nz/">cvt.co.nz</a><Link className="active" href={c("copy-007", "/")}>{c("copy-008", "CVT")}<small>{c("copy-009", "Bearings")}</small></Link><a href={c("copy-010", "https://cvt-parts.co.nz")}>{c("copy-011", "CVT")}<small>{c("copy-012", "Parts")}</small></a></div>
         <div className="utility-links"><ActiveLink href="/about-us">{nav("/about", c("copy-014", "About"))}</ActiveLink><ActiveLink href="/contact">{nav("/contact", c("copy-016", "Contact"))}</ActiveLink><ActiveLink href={firstName ? "/account" : "/login-sign-up"} match={["/login", "/account"]}>{firstName ? c("copy-017", "Hi, ${firstName}").replace("${firstName}", firstName) : c("copy-018", "Sign in / Sign up")}</ActiveLink><Link href={c("copy-019", "/account#wishlist")} className="utility-icon" aria-label={c("copy-020", "Wishlist")}><Heart size={17}/></Link><button onClick={() => setOpen(true)} aria-label={c("copy-021", "Open cart")}><ShoppingCart size={18}/>{count > 0 && <b>{count}</b>}</button></div>
       </div>
       <header className="main-header">
-        <Link href="/home" className="brand"><Image src={asset("assets/logo.png", "/assets/logo.png")} width={235} height={64} alt={c("copy-023", "CVT Bearings")} priority unoptimized /></Link>
+        <Link href="/" className="brand"><Image src={asset("assets/logo.png", "/assets/logo.png")} width={235} height={64} alt={c("copy-023", "CVT Bearings")} priority unoptimized /></Link>
         <nav className={menu ? "nav open" : "nav"} aria-label={c("copy-024", "Primary navigation")}>
-          <ActiveLink href="/home" exact onClick={() => setMenu(false)}>{c("copy-026", "Home")}</ActiveLink>
+          <ActiveLink href="/" exact onClick={() => setMenu(false)}>{c("copy-026", "Home")}</ActiveLink>
           <div className="nav-dropdown"><ActiveLink href="/bearings" match={["/products"]} onClick={() => setMenu(false)}>{nav("/bearings", c("copy-028", "Shop bearings"))} <ChevronDown size={15}/></ActiveLink><div><ActiveLink href="/bearings/main-bearing-kits" onClick={() => setMenu(false)}>{nav("/bearings/main-bearing-kits", c("copy-030", "Main bearing kits"))}</ActiveLink><ActiveLink href="/bearings/pulley-bearings" onClick={() => setMenu(false)}>{nav("/bearings/pulley-bearings", c("copy-032", "Pulley bearings"))}</ActiveLink><ActiveLink href="/bearings/primary-pulley-bearings" onClick={() => setMenu(false)}>{nav("/bearings/primary-pulley-bearings", c("copy-034", "Primary pulley bearings"))}</ActiveLink></div></div>
           <ActiveLink href="/general-info" match={["/shipping-and-returns", "/orders-and-payments"]} onClick={() => setMenu(false)}>{nav("/help", c("copy-036", "General information"))}</ActiveLink>
           <ActiveLink href="/blogs" onClick={() => setMenu(false)}>{nav("/blogs", c("copy-039", "Blogs"))}</ActiveLink>
