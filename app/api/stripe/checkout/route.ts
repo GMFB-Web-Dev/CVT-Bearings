@@ -1,6 +1,7 @@
 import type Stripe from "stripe";
 import { productCanCheckout, SITE_KEY } from "@/lib/catalog";
 import { getProductsUncached } from "@/lib/catalog-data";
+import { getCheckoutPauseMessage } from "@/lib/checkout-availability";
 import {
   attachStorefrontCheckoutSession,
   cancelStorefrontCheckoutOrder,
@@ -31,6 +32,9 @@ function parseLines(value: unknown) {
 }
 
 export async function POST(request: Request) {
+  const pauseMessage = getCheckoutPauseMessage();
+  if (pauseMessage) return jsonError(pauseMessage, 503, "CHECKOUT_PAUSED");
+
   let body: { items?: unknown };
   try {
     body = await request.json() as { items?: unknown };

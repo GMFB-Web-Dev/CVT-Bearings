@@ -8,7 +8,10 @@ import { LockKeyhole } from "lucide-react";
 import { money } from "@/lib/catalog";
 import { useCart } from "@/components/CartProvider";
 
-export function CartPage({ checkoutCancelled = false }: { checkoutCancelled?: boolean }) {
+export function CartPage({ checkoutCancelled = false, checkoutPauseMessage }: {
+  checkoutCancelled?: boolean;
+  checkoutPauseMessage: string | null;
+}) {
   const { lines, total, update, remove } = useCart();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -56,10 +59,15 @@ export function CartPage({ checkoutCancelled = false }: { checkoutCancelled?: bo
       <aside className="cart-totals">
         <h2>Cart totals</h2>
         <p className="cart-subtotal"><span>Subtotal</span><b>{money(total)}</b></p>
-        <small>Prices include GST. Delivery and the GST portion are shown in secure checkout before you pay.</small>
-        {error && <p className="error" role="alert">{error}</p>}
-        <button className="button wide checkout-button" onClick={checkout} disabled={loading}><LockKeyhole size={17}/>{loading ? "Opening secure checkout…" : "Secure checkout"}</button>
-        <small className="stripe-note">Payments are processed securely by Stripe.</small>
+        {checkoutPauseMessage ? <>
+          <small>Prices include GST.</small>
+          <p className="notice">{checkoutPauseMessage}</p>
+        </> : <>
+          <small>Prices include GST. Delivery and the GST portion are shown in secure checkout before you pay.</small>
+          {error && <p className="error" role="alert">{error}</p>}
+          <button className="button wide checkout-button" onClick={checkout} disabled={loading}><LockKeyhole size={17}/>{loading ? "Opening secure checkout…" : "Secure checkout"}</button>
+          <small className="stripe-note">Payments are processed securely by Stripe.</small>
+        </>}
       </aside>
     </div>
   </div>;

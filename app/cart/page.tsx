@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
 import { CartPage } from "@/components/CartPage";
+import { getCheckoutPauseMessage } from "@/lib/checkout-availability";
 
 export const metadata: Metadata = { title: "Cart" };
 
 export default async function Page({ searchParams }: { searchParams: Promise<{ checkout?: string }> }) {
   const { checkout } = await searchParams;
-  return <section className="cart-page"><CartPage checkoutCancelled={checkout === "cancelled"}/></section>;
+  return <section className="cart-page">
+    <CartPage checkoutCancelled={checkout === "cancelled"} checkoutPauseMessage={getCheckoutPauseMessage()} />
+  </section>;
 }
