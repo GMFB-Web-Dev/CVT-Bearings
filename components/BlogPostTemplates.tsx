@@ -104,7 +104,7 @@ export function BlogPostTemplate({ post, related = [] }: { post: BlogPost; relat
   const tableOfContents = [...bodySections, ...guideSections, ...caseStudySections];
   return (
     <article className={`cvt-blog cvt-blog--${post.template}`} id="blog-top">
-      <nav className="cvt-blog__breadcrumb" aria-label="Breadcrumb"><Link href="/home">Home</Link><span>/</span><Link href="/blogs">All Blogs</Link><span>/</span><span aria-current="page">{post.title}</span></nav>
+      <nav className="cvt-blog__breadcrumb" aria-label="Breadcrumb"><Link href="/">Home</Link><span>/</span><Link href="/blogs">All Blogs</Link><span>/</span><span aria-current="page">{post.title}</span></nav>
       {hero && <div className="cvt-blog__hero"><Picture image={hero} alt={post.featuredImageAlt} priority/></div>}
       <div className={`cvt-blog__content-frame${hero ? " has-hero" : ""}${tableOfContents.length ? " has-sidebar" : ""}`}>
         {!!tableOfContents.length && <aside className="cvt-blog__sidebar"><div><h2>Table of contents</h2><ol>{tableOfContents.map((item) => <li key={item.id}><a href={`#${item.id}`}>{item.title}</a></li>)}</ol></div></aside>}

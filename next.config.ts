@@ -6,8 +6,9 @@ const nextConfig: NextConfig = {
   experimental: {
     agentUpgrade: "security",
   },
+  // Keep the legacy URL working for browsers that cached the old / -> /home redirect.
+  rewrites: async () => [{ source: "/home", destination: "/" }],
   redirects: async () => [
-    { source: "/", destination: "/home", permanent: true },
     { source: "/about", destination: "/about-us", permanent: true },
     { source: "/help", destination: "/general-info", permanent: true },
     { source: "/shipping-returns", destination: "/shipping-and-returns", permanent: true },
