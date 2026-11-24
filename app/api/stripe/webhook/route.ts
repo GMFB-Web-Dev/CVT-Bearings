@@ -2,7 +2,7 @@ import type Stripe from "stripe";
 import { SITE_KEY } from "@/lib/catalog";
 import { sendOrderConfirmationEmail } from "@/lib/order-confirmation-email";
 import { cancelStorefrontCheckoutOrder, completeStorefrontCheckoutOrder } from "@/lib/storefront-orders";
-import { getSiteUrl, getStripe } from "@/lib/stripe";
+import { constructStripeWebhookEvent, getSiteUrl, getStripeConfig } from "@/lib/stripe";
 
 function dollars(cents: number | null | undefined) {
   return Math.max(0, cents || 0) / 100;
@@ -20,7 +20,7 @@ function addressLines(shipping: Stripe.Checkout.Session.CollectedInformation.Shi
   ].filter((line): line is string => Boolean(line));
 }
 
-async function markPaid(session: Stripe.Checkout.Session, siteUrl: string) {
+async function markPaid(stripe: Stripe, session: Stripe.Checkout.Session, siteUrl: string) {
   const orderId = session.metadata?.order_id || session.client_reference_id;
   if (!orderId || session.metadata?.site_key !== SITE_KEY || session.payment_status === "unpaid") return;
   if (session.amount_total == null) throw new Error("Paid Checkout Session is missing amount_total.");
@@ -44,7 +44,6 @@ async function markPaid(session: Stripe.Checkout.Session, siteUrl: string) {
   const customerEmail = session.customer_details?.email || session.customer_email;
   if (!customerEmail) throw new Error("Paid Checkout Session is missing the customer email.");
 
-  const stripe = getStripe();
   const lineItems = await stripe.checkout.sessions.listLineItems(session.id, {
     limit: 100,
     expand: ["data.price.product"],
@@ -83,22 +82,32 @@ async function markFailed(session: Stripe.Checkout.Session) {
   await cancelStorefrontCheckoutOrder(orderId);
 }
 
+function verifyWebhook(body: string, signature: string) {
+  const config = getStripeConfig();
+  try {
+    return constructStripeWebhookEvent(body, signature, config);
+  } catch (error) {
+    if (!config.managedLive) throw error;
+    // Sandbox sessions opened before the account switch can finish with their original signer.
+    return constructStripeWebhookEvent(body, signature, getStripeConfig(true));
+  }
+}
+
 export async function POST(request: Request) {
   const signature = request.headers.get("stripe-signature");
-  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
-  if (!signature || !webhookSecret) return new Response("Webhook is not configured.", { status: 400 });
+  if (!signature) return new Response("Missing signature.", { status: 400 });
 
-  let event: Stripe.Event;
+  let verified: ReturnType<typeof verifyWebhook>;
   try {
-    event = getStripe().webhooks.constructEvent(await request.text(), signature, webhookSecret);
-  } catch (error) {
-    console.error("Stripe webhook signature verification failed", error);
+    verified = verifyWebhook(await request.text(), signature);
+  } catch {
     return new Response("Invalid signature.", { status: 400 });
   }
 
+  const { event, stripe } = verified;
   try {
     if (event.type === "checkout.session.completed" || event.type === "checkout.session.async_payment_succeeded") {
-      await markPaid(event.data.object, getSiteUrl(request));
+      await markPaid(stripe, event.data.object, getSiteUrl(request));
     } else if (event.type === "checkout.session.async_payment_failed" || event.type === "checkout.session.expired") {
       await markFailed(event.data.object);
     }

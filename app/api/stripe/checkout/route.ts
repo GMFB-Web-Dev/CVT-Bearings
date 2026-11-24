@@ -7,7 +7,7 @@ import {
   createStorefrontCheckoutOrder,
 } from "@/lib/storefront-orders";
 import { createClient } from "@/lib/supabase/server";
-import { getNzGstTaxRateId, getSiteUrl, getStripe, STRIPE_INTEGRATION_IDENTIFIER } from "@/lib/stripe";
+import { getNzGstTaxRateId, getSiteUrl, getStripe, getStripeConfig, STRIPE_INTEGRATION_IDENTIFIER } from "@/lib/stripe";
 
 type IncomingLine = { productId?: unknown; quantity?: unknown };
 
@@ -62,18 +62,18 @@ export async function POST(request: Request) {
     return jsonError("A product is quote-only, out of stock, or no longer available. Remove it or request a quote.", 409);
   }
   let stripe: ReturnType<typeof getStripe>;
+  let stripeConfig: ReturnType<typeof getStripeConfig>;
   let gstTaxRateId: string;
   try {
-    stripe = getStripe();
-    gstTaxRateId = await getNzGstTaxRateId(stripe);
+    stripeConfig = getStripeConfig();
+    stripe = getStripe(stripeConfig);
+    gstTaxRateId = await getNzGstTaxRateId(stripe, stripeConfig);
   } catch (error) {
     console.error("Stripe checkout configuration error", error);
     return jsonError("Secure checkout is not configured yet. Please contact CVT Bearings.", 503);
   }
 
-  const shippingRateId = process.env.STRIPE_NZ_SHIPPING_RATE_ID?.trim();
-  const stripeSecretKey = process.env.STRIPE_SECRET_KEY || "";
-  const isStripeTestMode = /^(?:sk|rk)_test_/.test(stripeSecretKey);
+  const { shippingRateId, isTestMode: isStripeTestMode } = stripeConfig;
   if (!shippingRateId && !isStripeTestMode) {
     return jsonError("Checkout delivery configuration is not complete yet. Please contact CVT Bearings.", 503);
   }

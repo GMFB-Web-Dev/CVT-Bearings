@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { CheckoutCartCleanup } from "@/components/CheckoutCartCleanup";
 import { SITE_KEY } from "@/lib/catalog";
-import { getStripe } from "@/lib/stripe";
+import { getStripeForCheckoutSession } from "@/lib/stripe";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata = { title: "Payment received" };
@@ -11,11 +11,11 @@ export default async function CheckoutSuccessPage({ searchParams }: { searchPara
   let paid = false;
   let orderReference = "";
 
-  if (sessionId?.startsWith("cs_") && process.env.STRIPE_SECRET_KEY) {
+  if (sessionId?.startsWith("cs_")) {
     try {
       const supabase = await createClient();
       const { data: { user } } = await supabase.auth.getUser();
-      const session = await getStripe().checkout.sessions.retrieve(sessionId);
+      const session = await getStripeForCheckoutSession(sessionId).checkout.sessions.retrieve(sessionId);
       const belongsToUser = Boolean(user && session.metadata?.site_key === SITE_KEY && session.metadata?.user_id === user.id);
       paid = belongsToUser && (session.payment_status === "paid" || session.payment_status === "no_payment_required");
       orderReference = paid ? session.metadata?.order_id?.slice(0, 8).toUpperCase() || "" : "";
